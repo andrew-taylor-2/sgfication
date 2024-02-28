@@ -14,15 +14,12 @@ def find_best_match_location(large_image_path, small_image_paths):
     best_match_index = None
     
     for i, small_image_path in enumerate(small_image_paths):
-        # load the small image, convert it to grayscale
+        # load the small image, convert it to grayscale. convert to desired dtype of convolution output
         small_image = Image.open(small_image_path).convert('L')
-        small_image_np = np.asarray(small_image)
+        small_image_np = np.asarray(small_image).astype(np.float32)
         
-        # flip the small image in both axes (to make this convolution and not correlation)
-        small_image_np_flipped = np.flipud(np.fliplr(small_image_np))
-        
-        # perform 2D convolution
-        result = convolve2d(large_image_np, small_image_np_flipped, mode='valid')
+        # perform 2D convolution (flip kernel)
+        result = convolve2d(large_image_np, small_image_np[::-1,::-1], mode='valid')
         
         # find the peak value in the convolution result
         max_value = np.max(result)
