@@ -1,0 +1,22 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Python: Current File (Input Args)",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${file}",
+			"console": "integratedTerminal",
+			"args": ["${input:argumentPrompt}"]
+		}
+	],
+	"inputs": [
+        {
+            "id": "argumentPrompt",
+            "type": "promptString",
+            "description": "Enter the command-line arguments:",
+            "default": ""
+        }
+    ]
+}
+	
