@@ -3,7 +3,7 @@ import numpy as np
 from scipy.signal import convolve2d
 from PIL import Image
 
-def find_best_match_location(large_image_path, small_image_paths):
+def find_best_match_location(large_image_path, small_image_paths,return_matched_region=False):
     # load the large image and convert it to grayscale. convert to desired dtype of convolution output
     large_image = Image.open(large_image_path).convert('L')
     large_image_np = np.asarray(large_image).astype(np.float32)
@@ -27,18 +27,29 @@ def find_best_match_location(large_image_path, small_image_paths):
         # check if this result is better than what we've seen before
         if max_value > best_match_value:
             best_match_value = max_value
-            y, x = np.unravel_index(np.argmax(result), result.shape)
+            top_left_y, top_left_x = np.unravel_index(np.argmax(result), result.shape)
             best_match_location = (x, y)
             best_match_index = i
+
+    if return_matched_region:
+        # output matched region as Image
+        matched_height, matched_width = small_image_np.shape
+        matched_region = large_image.crop(top_left_x,top_left_y, top_left_x + matched_width, top_left_y + matched_height)
+        return best_match_index, best_match_location, matched_region
+    else:
+        # return the index of the best matching small image and its location
+        return best_match_index, best_match_location
+
     
-    # return the index of the best matching small image and its location
-    return best_match_index, best_match_location
+    
+    
 
 # if called from terminal
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Find which of the smaller images is contained in the larger image and its location.')
     parser.add_argument('large_image_path', type=str, help='Path to the large image')
     parser.add_argument('small_image_paths', type=str, nargs='+', help='Path to the small images')
+    parser.add_argument("--output", type=str, help="Path to save the output image of the matched region.", default="matched_region.png")
 
     args = parser.parse_args()
 
