@@ -28,7 +28,7 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
         if max_value > best_match_value:
             best_match_value = max_value
             top_left_y, top_left_x = np.unravel_index(np.argmax(result), result.shape)
-            best_match_location = (x, y)
+            best_match_location = (top_left_x, top_left_y)
             best_match_index = i
 
     if return_matched_region:
