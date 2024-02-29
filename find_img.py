@@ -4,9 +4,9 @@ from scipy.signal import convolve2d
 from PIL import Image
 
 def find_best_match_location(large_image_path, small_image_paths):
-    # load the large image and convert it to grayscale
+    # load the large image and convert it to grayscale. convert to desired dtype of convolution output
     large_image = Image.open(large_image_path).convert('L')
-    large_image_np = np.asarray(large_image)
+    large_image_np = np.asarray(large_image).astype(np.float32)
     
     # initialize variables to keep track of the best match
     best_match_value = -np.inf
@@ -14,9 +14,9 @@ def find_best_match_location(large_image_path, small_image_paths):
     best_match_index = None
     
     for i, small_image_path in enumerate(small_image_paths):
-        # load the small image, convert it to grayscale. convert to desired dtype of convolution output
+        # load the small image, convert it to grayscale
         small_image = Image.open(small_image_path).convert('L')
-        small_image_np = np.asarray(small_image).astype(np.float32)
+        small_image_np = np.asarray(small_image)
         
         # perform 2D convolution (flip kernel)
         result = convolve2d(large_image_np, small_image_np[::-1,::-1], mode='valid')
