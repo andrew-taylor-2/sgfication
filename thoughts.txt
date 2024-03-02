@@ -1,0 +1,41 @@
+Algorithm outline    
+    0.5 (if I were aiming to do this with physical board pictures, i would find corners and do affine transform)
+    1. find intersections
+    2. see if there are adjacent intersections in either direction (remember that go board is often not same height/width)
+    3.1 if adj. int. in both directions, get spacing in both directions
+    3.2 if adj. int. in one direction, get spacing in that direction. then look at spacing of non-adjacent intersections in the other direction. 
+        you can use the fact that the true intersection spacing in this direction will be close to the spacing in the other direction, while the intersection 
+        spacing of any two given non-adjacent intersections will be an integer multiple of the true int. spacing
+    4. now detect circles, find mode of radius, this is piece size. 
+    5. rescale piece images to this size (best way will be to hough circle piece images (ahead of time) and use the ratio to resize)
+    6. match pieces with known piece images (this part might not be necessary (but it's also what I have right now))
+    7. Fill in every board space that you can (noise should be nearly as regular as signal. Also board edge will be spaced wrong; and once you 
+        have a full board with good matches you can disregard outside)
+
+
+Old thoughts:
+
+Okay I need to deal with scaling.  probably the best idea is to detect piece size with hough circles (find mode bc there will be noise). 
+    rescale my piece images based on this (i will hough circle them and then just resize based on the ratio of these). I don't think there will be 
+    any way to avoid detecting empty intersections as well. basically to detect the scale of the whole thing, I'll need to look at adjacent objects of the same type 
+    basically i'll type it out simply below
+
+older thoughts:
+
+Is there any situation in which i would need to check for scaling? Dang I think there is lol
+    Honestly, probably the best way to account for this is to start reconstructing the grid before finding the pieces.
+    Since the grid lines seem easy to detect? And they could give you the spacing which would give you the approximate piece sizing
+    One other idea is to convolve the board with cropped version of itself? and the peaks in the convolution should be spaced evenly
+
+
+
+
+
+
+
+
+
+
+
+
+Random: i could get AI to randomly generate go board positions, then SGF them
