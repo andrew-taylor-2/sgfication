@@ -1,12 +1,11 @@
 import argparse
 import numpy as np
-#from scipy.signal import convolve2d
-#from PIL import Image
 import cv2 as cv
 
 
 def find_best_match_location(large_image_path, small_image_paths,return_matched_region=False):
-    # load the large image and convert it to grayscale. do i need to convert dtype?
+    
+    # load the large image and convert it to grayscale. 
     large_image_np = cv.imread(large_image_path,cv.IMREAD_GRAYSCALE)
     
     # initialize variables to keep track of the best match
@@ -19,7 +18,6 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
         small_image_np = cv.imread(small_image_path,cv.IMREAD_GRAYSCALE)
         
         # perform NCC
-        #result = convolve2d(large_image_np, small_image_np[::-1,::-1], mode='valid')
         result = cv.matchTemplate(large_image_np, small_image_np, cv.TM_CCORR_NORMED)
         
         # find the peak value and its location
