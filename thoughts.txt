@@ -12,6 +12,11 @@ Algorithm outline
     7. Fill in every board space that you can (noise should be nearly as regular as signal. Also board edge will be spaced wrong; and once you 
         have a full board with good matches you can disregard outside)
 
+Details
+1. find intersections:
+    find edges
+    find lines 
+
 
 Old thoughts:
 
@@ -26,6 +31,9 @@ Is there any situation in which i would need to check for scaling? Dang I think 
     Honestly, probably the best way to account for this is to start reconstructing the grid before finding the pieces.
     Since the grid lines seem easy to detect? And they could give you the spacing which would give you the approximate piece sizing
     One other idea is to convolve the board with cropped version of itself? and the peaks in the convolution should be spaced evenly
+
+I could AI generate boards for website, then identify those positions. Or if embedding that is too hard, I could mass make them on my own comp and allow site 
+    visitors to try out some
 
 
 

@@ -44,6 +44,7 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
     
 
 def find_intersections(image_path):
+    from numpy.linalg import LinAlgError
 
     # Step 1: Read the image
     img = cv.imread(image_path)
@@ -52,8 +53,17 @@ def find_intersections(image_path):
     # Step 2: Edge detection
     edges = cv.Canny(gray, 50, 150, apertureSize=3)
 
+    #debug
+    cv.imwrite('edges.png',edges)
+
     # Step 3: Line detection
-    lines = cv.HoughLines(edges, 1, np.pi / 180, 200)
+    lines = cv.HoughLines(edges, 1, np.pi / 180, 300)
+    #300 is a good starting place, underestimates slightly. 
+    #might need to use 300, check intersections, if i don't get enough, then decrease
+    #this isn't working very well on a dense board
+
+    #could try houghlines probabilistic
+    #lines = cv.HoughLinesP(edges, 1, np.pi / 180, threshold=50, minLineLength=30, maxLineGap=5)
 
     # Preparing to find intersections
     if lines is not None:
@@ -63,21 +73,37 @@ def find_intersections(image_path):
             for j in range(i + 1, len(lines)):
                 rho1, theta1 = lines[i]
                 rho2, theta2 = lines[j]
+
                 # Calculate intersection
                 A = np.array([
                     [np.cos(theta1), np.sin(theta1)],
                     [np.cos(theta2), np.sin(theta2)]
                 ])
                 b = np.array([[rho1], [rho2]])
-                x0, y0 = np.linalg.solve(A, b)
-                x0, y0 = int(np.round(x0)), int(np.round(y0))
-                intersections.append((x0, y0))
+                try:
+                    x0, y0 = np.linalg.solve(A, b)
+                    
+                    #check if solver is giving us overflow or if it's type conversion
+                    if x0.__abs__()>10000 or y0.__abs__()>10000:
+                        print('yep')
 
-        # Optionally: Filter intersections here based on your criteria
+                        #yes, solver is giving very large values
+
+                    x0, y0 = int(np.round(x0)), int(np.round(y0))
+
+                    #some of these are way too extreme so let's cut off things
+                    if x0.__abs__()<10000 and y0.__abs__()<10000:
+                        intersections.append((x0, y0))
+
+                except LinAlgError:
+                    # parallel lines will give singular matrix and error
+                    # better way to fix this could be to group lines based on slope 
+                    #   and then only find intersections between lines with significantly different slope
+                    pass
 
         # Display intersections on the image
         for x, y in intersections:
-            cv.circle(img, (x, y), radius=10, color=(0, 255, 0), thickness=-1)
+            cv.circle(img, (x, y), radius=3, color=(0, 255, 0), thickness=-1)
 
         cv.imshow('Intersections', img)
         cv.waitKey(0)
