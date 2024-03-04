@@ -44,72 +44,100 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
     
 
 def find_intersections(image_path):
-    from numpy.linalg import LinAlgError
+    #from numpy.linalg import LinAlgError
 
     # Step 1: Read the image
     img = cv.imread(image_path)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
+    # Step 1.5: smooth for more regular edges
+    blurred = cv.GaussianBlur(gray, (5,5), 0)
+
     # Step 2: Edge detection
-    edges = cv.Canny(gray, 50, 150, apertureSize=3)
+    edges = cv.Canny(blurred, 50, 150, apertureSize=3)
+
+    # Step 2.5: dilate and erode
+    dilated = cv.dilate(edges, None, iterations=2)
+
+    edges = cv.erode(dilated, None, iterations=3)
+
+    #the dilation and erosion is good for finding lines, it won't be as good for finding circles
 
     #debug
     cv.imwrite('edges.png',edges)
 
     # Step 3: Line detection
-    lines = cv.HoughLines(edges, 1, np.pi / 180, 300)
+    #lines = cv.HoughLines(edges, 1, np.pi / 180, 300)
     #300 is a good starting place, underestimates slightly. 
     #might need to use 300, check intersections, if i don't get enough, then decrease
     #this isn't working very well on a dense board
 
     #could try houghlines probabilistic
-    #lines = cv.HoughLinesP(edges, 1, np.pi / 180, threshold=50, minLineLength=30, maxLineGap=5)
+    lines = cv.HoughLinesP(edges, 1, np.pi / 180, threshold=50, minLineLength=20, maxLineGap=5)
+
+    # i think the probabilistic isn't sampling enough, still getting weird false negatives. need to find out why. 
 
     # Preparing to find intersections
+    intersections = []
+
     if lines is not None:
-        lines = [l[0] for l in lines]  # Extracting line information
-        intersections = []
         for i in range(len(lines)):
-            for j in range(i + 1, len(lines)):
-                rho1, theta1 = lines[i]
-                rho2, theta2 = lines[j]
+            for j in range(i+1, len(lines)):
+                line1 = lines[i][0]
+                line2 = lines[j][0]
+                intersection = segment_intersection(line1, line2)
+                if intersection:
+                    intersections.append(intersection)
+    
+    # visually represent for debug
+    #     for line in lines:
+    #         x1, y1, x2, y2 = line[0]
+    #         cv.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-                # Calculate intersection
-                A = np.array([
-                    [np.cos(theta1), np.sin(theta1)],
-                    [np.cos(theta2), np.sin(theta2)]
-                ])
-                b = np.array([[rho1], [rho2]])
-                try:
-                    x0, y0 = np.linalg.solve(A, b)
-                    
-                    #check if solver is giving us overflow or if it's type conversion
-                    if x0.__abs__()>10000 or y0.__abs__()>10000:
-                        print('yep')
+    # # Step 5: Show the result
+    # cv.imshow('Hough Lines', img)
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
-                        #yes, solver is giving very large values
+    # Display intersections on the image
+    for x, y in intersections:
+        cv.circle(img, (x, y), radius=3, color=(0, 255, 0), thickness=-1)
 
-                    x0, y0 = int(np.round(x0)), int(np.round(y0))
+    cv.imshow('Intersections', img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
-                    #some of these are way too extreme so let's cut off things
-                    if x0.__abs__()<10000 and y0.__abs__()<10000:
-                        intersections.append((x0, y0))
 
-                except LinAlgError:
-                    # parallel lines will give singular matrix and error
-                    # better way to fix this could be to group lines based on slope 
-                    #   and then only find intersections between lines with significantly different slope
-                    pass
+def segment_intersection(line1, line2, tolerance=1):
+    # need to find intersections this way rather than something more intuitive like using slopes
+    #   because we could run into trouble with infinite slopes (in fact, half of the slopes that 
+    #   interest us are infinite)
 
-        # Display intersections on the image
-        for x, y in intersections:
-            cv.circle(img, (x, y), radius=3, color=(0, 255, 0), thickness=-1)
-
-        cv.imshow('Intersections', img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+    # Unpack line segment endpoints
+    x1, y1, x2, y2 = line1
+    x3, y3, x4, y4 = line2
+    
+    # Calculate denominators
+    den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    
+    # Check if lines are parallel (denominator == 0)
+    if den == 0:
+        return None  # No intersection
+    
+    # Calculate intersection point
+    px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / den
+    py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / den
+    
+    # Check if the intersection point is within both line segments, allowing wiggle room
+    #   Need wiggle room because otherwise line endpoint touching other line segment might not be found
+    if min(x1, x2) - tolerance <= px <= max(x1, x2) + tolerance and \
+        min(y1, y2) - tolerance <= py <= max(y1, y2) + tolerance and \
+        min(x3, x4) - tolerance <= px <= max(x3, x4) + tolerance and \
+        min(y3, y4) - tolerance <= py <= max(y3, y4) + tolerance:
+        return (int(px), int(py))
     else:
-        print("No lines were detected.")
+        return None
+
 
 
 if __name__ == '__main__':
