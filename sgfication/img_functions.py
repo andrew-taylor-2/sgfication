@@ -43,7 +43,7 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
         return best_match_index, best_match_location
     
 
-def find_intersections(image_path):
+def find_intersections(image_path, keep_intermediate=True):
     #from numpy.linalg import LinAlgError
 
     # Step 1: Read the image
@@ -53,8 +53,16 @@ def find_intersections(image_path):
     # Step 1.5: smooth for more regular edges
     blurred = cv.GaussianBlur(gray, (5,5), 0)
 
+    if keep_intermediate:
+        #debug
+        cv.imwrite('blurred.png',blurred)
+
     # Step 2: Edge detection
     edges = cv.Canny(blurred, 50, 150, apertureSize=3)
+
+    if keep_intermediate:
+        #debug
+        cv.imwrite('edges.png',edges)
 
     # Step 2.5: dilate and erode
     dilated = cv.dilate(edges, None, iterations=2)
@@ -63,8 +71,9 @@ def find_intersections(image_path):
 
     #the dilation and erosion is good for finding lines, it won't be as good for finding circles
 
-    #debug
-    cv.imwrite('edges.png',edges)
+    if keep_intermediate:
+        #debug
+        cv.imwrite('edges_erodil.png',edges)
 
     # Step 3: Line detection
     #lines = cv.HoughLines(edges, 1, np.pi / 180, 300)
@@ -89,24 +98,26 @@ def find_intersections(image_path):
                 if intersection:
                     intersections.append(intersection)
     
-    # visually represent for debug
-    #     for line in lines:
-    #         x1, y1, x2, y2 = line[0]
-    #         cv.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    if keep_intermediate:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            cv.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-    # # Step 5: Show the result
-    # cv.imshow('Hough Lines', img)
-    # cv.waitKey(0)
-    # cv.destroyAllWindows()
+        #debug
+        cv.imwrite('prob_houghlines.png', img)
 
-    # Display intersections on the image
-    for x, y in intersections:
-        cv.circle(img, (x, y), radius=3, color=(0, 255, 0), thickness=-1)
+    if keep_intermediate:
+        # Display intersections on the image
+        for x, y in intersections:
+            cv.circle(img, (x, y), radius=3, color=(0, 0, 255), thickness=-1)
 
-    cv.imshow('Intersections', img)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+        cv.imwrite('intersections.png', img)
+    
+    return intersections
 
+
+
+# Helper functions section
 
 def segment_intersection(line1, line2, tolerance=1):
     # need to find intersections this way rather than something more intuitive like using slopes
@@ -137,6 +148,55 @@ def segment_intersection(line1, line2, tolerance=1):
         return (int(px), int(py))
     else:
         return None
+
+
+def group_intersections_by_axis(intersections):
+    # Separate intersections into rows and columns based on their coordinates
+    rows = {}
+    columns = {}
+    for x, y in intersections:
+        # Group by y-coordinate for rows
+        if y not in rows:
+            rows[y] = []
+        rows[y].append((x, y))
+        
+        # Group by x-coordinate for columns
+        if x not in columns:
+            columns[x] = []
+        columns[x].append((x, y))
+    
+    # Sort intersections in each row and column
+    for k in rows:
+        rows[k].sort(key=lambda coord: coord[0])  # Sort by x-coordinate
+    for k in columns:
+        columns[k].sort(key=lambda coord: coord[1])  # Sort by y-coordinate
+    
+    return rows, columns
+
+
+def calculate_spacing(rows_or_columns):
+    distances = []
+    for axis, intersections in rows_or_columns.items():
+        for i in range(len(intersections) - 1):
+            dist = np.linalg.norm(np.array(intersections[i]) - np.array(intersections[i + 1]))
+            distances.append(dist)
+    return distances
+
+
+def get_spacing(image_path):
+    intersections = find_intersections(image_path)
+    rows, columns = group_intersections_by_axis(intersections)
+    row_distances = calculate_spacing(rows)
+    column_distances = calculate_spacing(columns)
+    
+    # Use mode to find the most common distance, assuming minor variations
+    row_spacing = mode(row_distances)[0][0]
+    column_spacing = mode(column_distances)[0][0]
+    
+    print(f"Row spacing: {row_spacing}, Column spacing: {column_spacing}")
+
+
+
 
 
 
