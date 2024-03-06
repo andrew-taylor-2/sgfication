@@ -165,6 +165,9 @@ def group_intersections_by_axis(intersections):
             columns[x] = []
         columns[x].append((x, y))
     
+    # While the above works, it seems inefficient to store both x and y when one of them is the key. still, this does 
+    #   make for less clunky looking code
+
     # Sort intersections in each row and column
     for k in rows:
         rows[k].sort(key=lambda coord: coord[0])  # Sort by x-coordinate
@@ -183,15 +186,16 @@ def calculate_spacing(rows_or_columns):
     return distances
 
 
-def get_spacing(image_path):
+def get_all_spacing(image_path):
+    from statistics import mode
     intersections = find_intersections(image_path)
     rows, columns = group_intersections_by_axis(intersections)
     row_distances = calculate_spacing(rows)
     column_distances = calculate_spacing(columns)
     
     # Use mode to find the most common distance, assuming minor variations
-    row_spacing = mode(row_distances)[0][0]
-    column_spacing = mode(column_distances)[0][0]
+    row_spacing = mode(row_distances)
+    column_spacing = mode(column_distances)
     
     print(f"Row spacing: {row_spacing}, Column spacing: {column_spacing}")
 
@@ -215,6 +219,10 @@ if __name__ == '__main__':
     parser_find_intersections = subparsers.add_parser('find_intersections', help='Find intersections in the given image.')
     parser_find_intersections.add_argument('image_path', type=str, help='Path to the image for finding intersections')
 
+    #parser for getting spacing
+    parser_get_all_spacing = subparsers.add_parser('get_all_spacing', help='Find the row and column spacing.')
+    parser_get_all_spacing.add_argument('image_path', type=str, help='Path to the image for which we want row and column spacing')
+
     args = parser.parse_args()
 
     if args.command == 'find_best_match':
@@ -228,3 +236,6 @@ if __name__ == '__main__':
 
     elif args.command == 'find_intersections':
         find_intersections(args.image_path)
+    
+    elif args.command == 'get_all_spacing':
+        get_all_spacing(args.image_path)
