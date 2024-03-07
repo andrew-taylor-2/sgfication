@@ -117,6 +117,54 @@ def find_intersections(image_path, keep_intermediate=True):
 
 
 
+def find_circles(image_path, row_spacing, column_spacing, keep_intermediate=True):
+
+    #recycling this from intersections code
+
+    # Step 1: Read the image
+    img = cv.imread(image_path)
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    # Step 1.5: smooth for more regular edges
+    blurred = cv.GaussianBlur(gray, (5,5), 0)
+
+    if keep_intermediate:
+        #debug
+        cv.imwrite('blurred.png',blurred)
+
+    # Step 2: Edge detection
+    edges = cv.Canny(blurred, 50, 150, apertureSize=3)
+
+    if keep_intermediate:
+        #debug
+        cv.imwrite('edges.png',edges)
+
+    #the erosion and dilations don't help with the circles
+
+    # Step 3: Circle detection
+
+    #we're going to use spacing info to bound piece size
+    average_spacing=(row_spacing + column_spacing) / 2
+    upper_bound_piece_radius= np.round(   (average_spacing/2) * 1.05  ).astype("int")
+    lower_bound_piece_radius= np.round(   (average_spacing/2) * 0.8   ).astype("int")
+
+    #min circle distance is based on spacing as well
+    min_circle_dist=average_spacing * 0.9 
+
+    #could try houghlines probabilistic (i have good values for size bounds, so I'm setting param2 a little lower)
+    circles = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, min_circle_dist, param1=50, param2=20, minRadius=lower_bound_piece_radius, maxRadius=upper_bound_piece_radius)
+
+    #put circles on image
+    if circles is not None:
+        # get circle params as integers
+        circles = np.round(circles[0, :]).astype("int")    
+
+        for (x, y, r) in circles:
+            cv.circle(img, (x, y), r, (0, 255, 0), 2)
+    
+    cv.imwrite('circles.png', img)
+    return circles
+
 # Helper functions section
 
 def segment_intersection(line1, line2, tolerance=1):
@@ -198,6 +246,8 @@ def get_all_spacing(image_path):
     column_spacing = mode(column_distances)
     
     print(f"Row spacing: {row_spacing}, Column spacing: {column_spacing}")
+
+    return row_spacing, column_spacing
 
 
 
