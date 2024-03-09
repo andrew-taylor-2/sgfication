@@ -6,7 +6,8 @@ Algorithm outline
     3.2 if adj. int. in one direction, get spacing in that direction. then look at spacing of non-adjacent intersections in the other direction. 
         you can use the fact that the true intersection spacing in this direction will be close to the spacing in the other direction, while the intersection 
         spacing of any two given non-adjacent intersections will be an integer multiple of the true int. spacing
-    4. now detect circles, find mode of radius, this is piece size. 
+    4.1 now detect circles, find mode of radius, this is piece size. 
+    4.2 might have to k-meansa and choose the larger circle size, since the "glint" on the stones also looks like a circle
     5. rescale piece images to this size (best way will be to hough circle piece images (ahead of time) and use the ratio to resize)
     6. match pieces with known piece images (this part might not be necessary (but it's also what I have right now))
     7. Fill in every board space that you can (noise should be nearly as regular as signal. Also board edge will be spaced wrong; and once you 

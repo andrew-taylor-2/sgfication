@@ -167,10 +167,12 @@ def find_circles(image_path, row_spacing, column_spacing, keep_intermediate=True
 
 # Helper functions section
 
-def segment_intersection(line1, line2, tolerance=1):
+def segment_intersection(line1, line2, tolerance=1, corner_tolerance=None):
     # need to find intersections this way rather than something more intuitive like using slopes
     #   because we could run into trouble with infinite slopes (in fact, half of the slopes that 
     #   interest us are infinite)
+
+    # set corner_tolerance if we want to check for corners
 
     # Unpack line segment endpoints
     x1, y1, x2, y2 = line1
@@ -193,9 +195,30 @@ def segment_intersection(line1, line2, tolerance=1):
         min(y1, y2) - tolerance <= py <= max(y1, y2) + tolerance and \
         min(x3, x4) - tolerance <= px <= max(x3, x4) + tolerance and \
         min(y3, y4) - tolerance <= py <= max(y3, y4) + tolerance:
-        return (int(px), int(py))
+        intersection = (int(px), int(py))
     else:
-        return None
+        intersection = None
+    
+    # optionally check cornerness (note that, due to conditionals, corner_tolerance more than intersection tolerance is unhelpful)
+    if corner_tolerance and intersection is not None:
+        #check if one of the endpoints touches intersection for each segment
+        if ( abs(px-x1) <= corner_tolerance and abs(py-y1) <= corner_tolerance ) ^ \
+            ( abs(px-x2) <= corner_tolerance and abs(py-y2) <= corner_tolerance ) and \
+            ( abs(px-x3) <= corner_tolerance and abs(py-y3) <= corner_tolerance ) ^ \
+            ( abs(px-x4) <= corner_tolerance and abs(py-y4) <= corner_tolerance ):
+
+            is_corner=True
+
+        else:
+            is_corner=False
+    
+        return intersection, is_corner
+    
+    else:
+        return intersection
+
+
+    
 
 
 def group_intersections_by_axis(intersections):
