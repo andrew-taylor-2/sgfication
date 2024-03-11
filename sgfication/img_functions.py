@@ -43,7 +43,7 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
         return best_match_index, best_match_location
     
 
-def find_intersections(image_path, keep_intermediate=True):
+def find_intersections(image_path, keep_intermediate=True, only_perpendicular=True):
     #from numpy.linalg import LinAlgError
 
     # Step 1: Read the image
@@ -222,7 +222,33 @@ def segment_intersection(line1, line2, tolerance=1, corner_tolerance=None):
         return intersection, None
 
 
+def is_perpendicular(line1, line2):
+    x1, y1, x2, y2 = line1
+    x3, y3, x4, y4 = line2
+
+    # Check for vertical lines first (avoiding divide by zero)
+    delta_x = (x2 - x1, x4 - x3)
+
+    if abs(delta_x[0]) < 5  and abs(delta_x[1]) < 5 :
+        #if they're both vertical then they aren't perp
+        return False
     
+    elif delta_x[0] == 0:
+        #check if line2 is nearly horizontal
+        return abs(y3-y4) < 5 
+
+    elif delta_x[1] == 0:
+        #check if line 1 is nearly horizontal
+        return abs(y1-y2) < 5
+    
+    #might want to base tolerance off image size; these tolerances are kind of large for min line seg length of 20
+    
+
+    m1 = (y2 - y1) / (x2 - x1)
+    m2 = (y4 - y3) / (x4 - x3)
+
+    # Check if the product of slopes is close to -1 (within a tolerance)
+    return abs(m1 * m2 + 1) < 0.1  # Adjust tolerance as necessary
 
 
 def group_intersections_by_axis(intersections):
