@@ -94,7 +94,7 @@ def find_intersections(image_path, keep_intermediate=True):
             for j in range(i+1, len(lines)):
                 line1 = lines[i][0]
                 line2 = lines[j][0]
-                intersection = segment_intersection(line1, line2)
+                intersection, is_corner = segment_intersection(line1, line2)
                 if intersection:
                     intersections.append(intersection)
     
@@ -183,7 +183,7 @@ def segment_intersection(line1, line2, tolerance=1, corner_tolerance=None):
     
     # Check if lines are parallel (denominator == 0)
     if den == 0:
-        return None  # No intersection
+        return None, None  # No intersection
     
     # Calculate intersection point
     px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / den
@@ -215,7 +215,7 @@ def segment_intersection(line1, line2, tolerance=1, corner_tolerance=None):
         return intersection, is_corner
     
     else:
-        return intersection
+        return intersection, None
 
 
     
