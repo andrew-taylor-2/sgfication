@@ -94,11 +94,13 @@ def find_intersections(image_path, keep_intermediate=True, only_perpendicular=Tr
             for j in range(i+1, len(lines)):
                 line1 = lines[i][0]
                 line2 = lines[j][0]
-                intersection, is_corner = segment_intersection(line1, line2, 3, 3)
-                if is_corner:
-                    corners.append(intersection)
-                elif intersection:
-                    intersections.append(intersection)
+
+                if is_perpendicular(line1, line2):
+                    intersection, is_corner = segment_intersection(line1, line2, 3, 3)
+                    if is_corner:
+                        corners.append(intersection)
+                    elif intersection:
+                        intersections.append(intersection)
     
     if keep_intermediate:
         for line in lines:
