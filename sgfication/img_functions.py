@@ -95,7 +95,7 @@ def find_intersections(image_path, keep_intermediate=True, only_perpendicular=Tr
                 line1 = lines[i][0]
                 line2 = lines[j][0]
 
-                if is_perpendicular(line1, line2):
+                if are_vertical_and_horizontal(line1, line2):
                     intersection, is_corner = segment_intersection(line1, line2, 3, 3)
                     if is_corner:
                         corners.append(intersection)
@@ -224,33 +224,20 @@ def segment_intersection(line1, line2, tolerance=1, corner_tolerance=None):
         return intersection, None
 
 
-def is_perpendicular(line1, line2):
+def are_vertical_and_horizontal(line1, line2, tolerance=5):
     x1, y1, x2, y2 = line1
     x3, y3, x4, y4 = line2
 
-    # Check for vertical lines first (avoiding divide by zero)
-    delta_x = (x2 - x1, x4 - x3)
+    #just check distance in each dim (slope approach doesn't play well with vertical and horizontal lines)
+    vertical = (abs(x2 - x1) < tolerance , abs(x4 - x3) < tolerance)
+    horizontal = (abs(y2 - y1) < tolerance , abs(y4 - y3) < tolerance)
 
-    if abs(delta_x[0]) < 5  and abs(delta_x[1]) < 5 :
-        #if they're both vertical then they aren't perp
+    if (vertical[0] and horizontal[1]) or (vertical[1] and horizontal[0]):
+        return True
+    else:
         return False
-    
-    elif delta_x[0] == 0:
-        #check if line2 is nearly horizontal
-        return abs(y3-y4) < 5 
 
-    elif delta_x[1] == 0:
-        #check if line 1 is nearly horizontal
-        return abs(y1-y2) < 5
-    
     #might want to base tolerance off image size; these tolerances are kind of large for min line seg length of 20
-    
-
-    m1 = (y2 - y1) / (x2 - x1)
-    m2 = (y4 - y3) / (x4 - x3)
-
-    # Check if the product of slopes is close to -1 (within a tolerance)
-    return abs(m1 * m2 + 1) < 0.1  # Adjust tolerance as necessary
 
 
 def group_intersections_by_axis(intersections):
