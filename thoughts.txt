@@ -18,15 +18,34 @@ Details
     find edges
     find lines 
 
+newest thoughts:
 
-Old thoughts:
+It's time to use assets to drag me across the finish line. Corner screenshots included, probably
+
+could make a script that will crop a piece/intersection screenshot optimally. maybe by iteratively cropping then convolving and
+    looking at peak/total values?
+
+Also, I need a function that takes our proposed intersections, circles, maybe corners, and gets the board location from this
+    This includes filtering out out of bounds false positives.
+
+
+old thoughts:
+
+Maybe to get all intersections, i could get image of intersections (probably could utilize spacing knowledge), then average them. Then match template with board.
+    But do i have a fix for the fact that some intersections aren't plus shaped? can I transform this average into a corner image?
+
+Some of my functions with several arbitrary parameters could benefit from a parameter exploration mechanism
+
+I can probably reuse my intersection code to find corners by seeing if endpoints match
+
+Older thoughts:
 
 Okay I need to deal with scaling.  probably the best idea is to detect piece size with hough circles (find mode bc there will be noise). 
     rescale my piece images based on this (i will hough circle them and then just resize based on the ratio of these). I don't think there will be 
     any way to avoid detecting empty intersections as well. basically to detect the scale of the whole thing, I'll need to look at adjacent objects of the same type 
     basically i'll type it out simply below
 
-older thoughts:
+olderer thoughts:
 
 Is there any situation in which i would need to check for scaling? Dang I think there is lol
     Honestly, probably the best way to account for this is to start reconstructing the grid before finding the pieces.
