@@ -28,6 +28,10 @@ could make a script that will crop a piece/intersection screenshot optimally. ma
 Also, I need a function that takes our proposed intersections, circles, maybe corners, and gets the board location from this
     This includes filtering out out of bounds false positives.
 
+should dockerize it
+
+I think it's best if all the functions just take in image arrays rather than filenames, i should refactor
+
 
 old thoughts:
 
