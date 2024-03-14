@@ -43,7 +43,7 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
         return best_match_index, best_match_location
     
 
-def find_intersections(image_path, keep_intermediate=True, only_perpendicular=True):
+def find_intersections(image_path, keep_intermediate=False, return_corners=False):
     #from numpy.linalg import LinAlgError
 
     # Step 1: Read the image
@@ -118,8 +118,10 @@ def find_intersections(image_path, keep_intermediate=True, only_perpendicular=Tr
             cv.circle(img, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
 
         cv.imwrite('intersections.png', img)
-    
-    return intersections, corners
+    if return_corners:
+        return intersections, corners
+    else:
+        return intersections.extend(corners)
 
 
 
