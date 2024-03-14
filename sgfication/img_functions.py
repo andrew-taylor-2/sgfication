@@ -121,7 +121,8 @@ def find_intersections(image_path, keep_intermediate=False, return_corners=False
     if return_corners:
         return intersections, corners
     else:
-        return intersections.extend(corners)
+        intersections.extend(corners)
+        return intersections
 
 
 
