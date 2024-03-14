@@ -19,7 +19,15 @@ def crop_piece(board_img_fn, piece_img_fn):
     circles = imf.find_circles(piece_img_fn, row_spacing, column_spacing)
 
     if circles is not None:
-        intersections = imf.find_intersections(board_img_fn, keep_intermediate=False)
+        #get biggest circle
+        circle=max(circles,key=lambda r: r[2])
+        x, y, _ = circle
+
+        print('circles')
+
+    else:
+
+        intersections = imf.find_intersections(piece_img_fn, keep_intermediate=False)
 
         #if we have multiple, we can use one closest to image center as heuristic
         img_center = (piece_img_gray.shape[1] // 2, piece_img_gray.shape[0] // 2)
@@ -27,11 +35,12 @@ def crop_piece(board_img_fn, piece_img_fn):
 
         x, y = centerest_intersection
 
-    else:
-        #get biggest circle
-        circle=max(circles,key=lambda r: r[2])
-        x, y, _ = circle
+        print('intersections')
     
+    
+    print(f"x {x} y {y} ")
+    print(f"x dim {piece_img_gray.shape[1]} y dim {piece_img_gray.shape[0]}")
+
     #now crop it with bounding box centered on this spot
     #   maxes and mins to ensure we don't go outside image boundaries
     
