@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 
 
-def find_best_match(large_image_path, small_image_paths,return_matched_region=False):
+def match_asset_to_board(large_image_path, small_image_paths,return_matched_region=False):
 
     """finds best match and location out of multiple small images. Will help to decide which assets to use."""
     
@@ -349,10 +349,10 @@ if __name__ == '__main__':
 
     if args.command == 'find_best_match':
         if not args.output:
-            best_match_index, location = find_best_match(args.large_image_path, args.small_image_paths)
+            best_match_index, location = match_asset_to_board(args.large_image_path, args.small_image_paths)
             print(f"Small image {best_match_index} is the best match, located at: {location}")
         else:
-            best_match_index, location, matched_region_image = find_best_match(args.large_image_path, args.small_image_paths, return_matched_region=True)
+            best_match_index, location, matched_region_image = match_asset_to_board(args.large_image_path, args.small_image_paths, return_matched_region=True)
             cv.imwrite(args.output, matched_region_image)
             print(f"Matched region saved to {args.output}")
 
