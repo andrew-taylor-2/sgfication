@@ -1,25 +1,31 @@
 from os import listdir
 from os.path import isfile, join, splitext, basename
 import crop_piece
+from pathlib import Path
 
-crop_folder = r"C:\Users\andre\OneDrive\Pictures\Screenshots\assets"
-exclude = r"C:\Users\andre\OneDrive\Pictures\Screenshots\assets\OGS_default_board.png"
-board = exclude
 
-#get files in dir
-files = [f for f in listdir(crop_folder) if isfile(join(crop_folder, f)) and join(crop_folder, f) != exclude]
+def generate_new_file_path(original_path, appended='_cropped'):
+    """Generates a new file path with string appended."""
+
+    original_path = Path(original_path)
+    new_file_name = f"{original_path.stem}{appended}{original_path.suffix}"
+    return original_path.parent / new_file_name
+
+
+
+crop_folder = Path(r"C:\Users\andre\OneDrive\Pictures\Screenshots\assets")
+exclude_file = crop_folder / "OGS_default_board.png"
+
+# Get files in dir except exclude_file
+files = [f for f in crop_folder.iterdir() if f.is_file() and f != exclude_file]
 
 for f in files:
-    # Generate the new file name with '_cropped' appended before the file extension
-    full_path = join(crop_folder, f)  # Get the full path of the file
-    file_name_without_ext, file_ext = splitext(basename(full_path))  # Split the basename and extension
-    new_file_name = f"{file_name_without_ext}_cropped{file_ext}"  # Append '_cropped' to the file name
-    new_full_path = join(crop_folder, new_file_name)  # Generate the new full path
+    new_full_path = generate_new_file_path(f)
 
-    # Use the new_full_path as the outfile parameter
     try:
-        crop_piece.crop_piece(board, full_path, outfile=new_full_path)
+        crop_piece.crop_piece(str(exclude_file), str(f), outfile=str(new_full_path))
+    except Exception as e:  
+        print(f"there was an error with file {f}: {e}")
 
-    except:
-        print(f"there was an error with file {full_path}")
+
 

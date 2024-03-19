@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 from sgfication import img_functions as imf
 
-def crop_piece(board_img_fn, piece_img_fn):
+def crop_piece(board_img_fn, piece_img_fn, outfile='cropped_piece.png'):
 
     # Load the image
     #board_img = cv.imread(str(board_img_fn))
@@ -56,7 +56,8 @@ def crop_piece(board_img_fn, piece_img_fn):
 
     cropped_img = piece_img[crop_top:crop_bottom, crop_left:crop_right]
 
-    cv.imwrite('cropped_piece.png', cropped_img)
+    cv.imwrite(outfile, cropped_img)
 
-import sys
-crop_piece(sys.argv[1],sys.argv[2])
+if __name__ == "__main__":
+    import sys
+    crop_piece(sys.argv[1],sys.argv[2])
