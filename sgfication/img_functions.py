@@ -3,7 +3,9 @@ import numpy as np
 import cv2 as cv
 
 
-def find_best_match_location(large_image_path, small_image_paths,return_matched_region=False):
+def find_best_match(large_image_path, small_image_paths,return_matched_region=False):
+
+    """finds best match and location out of multiple small images. Will help to decide which assets to use."""
     
     # load the large image and convert it to grayscale. 
     large_image_np = cv.imread(large_image_path,cv.IMREAD_GRAYSCALE)
@@ -28,7 +30,6 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
             best_match_value = max_value
             #top_left_y, top_left_x = np.unravel_index(np.argmax(result), result.shape)
             best_match_top_left = max_loc
-            #this line isn't necessary, let's see if i need it for later...
             best_match_index = i
 
     if return_matched_region:
@@ -42,6 +43,29 @@ def find_best_match_location(large_image_path, small_image_paths,return_matched_
         # return the index of the best matching small image and its location
         return best_match_index, best_match_location
     
+
+
+def find_matches(board_img_path, template_img_path, threshold=0.8):
+    board_img = cv.imread(board_img_path, 0)  # Load the board image in grayscale
+    template_img = cv.imread(template_img_path, 0)  # Load the template image in grayscale
+    w, h = template_img.shape[::-1]  # Get the dimensions of the template
+
+    # Perform template matching
+    res = cv.matchTemplate(board_img, template_img, cv.TM_CCOEFF_NORMED) # Should I blur first?
+    loc = np.where(res >= threshold)
+
+    matches = []
+    for pt in zip(*loc[::-1]):  # Switch x and y coordinates
+        matches.append(pt)
+        # Optional: for visualization
+        cv.rectangle(board_img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+    
+    # Optional: Show the result
+    cv.imshow('Detected', board_img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+    return matches
 
 def find_intersections(image_path, keep_intermediate=False, return_corners=False):
     #from numpy.linalg import LinAlgError
@@ -300,6 +324,9 @@ def get_all_spacing(image_path):
 
 
 if __name__ == '__main__':
+
+    #IVE MADE SOME CHANGES AND NEED TO UPDATE ARGPARSER
+
     # create a subparser to handle different commands
     parser = argparse.ArgumentParser(description='Image processing utilities')
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
@@ -322,10 +349,10 @@ if __name__ == '__main__':
 
     if args.command == 'find_best_match':
         if not args.output:
-            best_match_index, location = find_best_match_location(args.large_image_path, args.small_image_paths)
+            best_match_index, location = find_best_match(args.large_image_path, args.small_image_paths)
             print(f"Small image {best_match_index} is the best match, located at: {location}")
         else:
-            best_match_index, location, matched_region_image = find_best_match_location(args.large_image_path, args.small_image_paths, return_matched_region=True)
+            best_match_index, location, matched_region_image = find_best_match(args.large_image_path, args.small_image_paths, return_matched_region=True)
             cv.imwrite(args.output, matched_region_image)
             print(f"Matched region saved to {args.output}")
 
@@ -334,3 +361,4 @@ if __name__ == '__main__':
     
     elif args.command == 'get_all_spacing':
         get_all_spacing(args.image_path)
+
