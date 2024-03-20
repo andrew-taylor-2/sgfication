@@ -296,7 +296,7 @@ def group_intersections_by_axis(intersections):
 
 def calculate_spacing(rows_or_columns):
     distances = []
-    for axis, intersections in rows_or_columns.items():
+    for intersections in rows_or_columns.values():
         for i in range(len(intersections) - 1):
             dist = np.linalg.norm(np.array(intersections[i]) - np.array(intersections[i + 1]))
             distances.append(dist)
