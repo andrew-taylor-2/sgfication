@@ -67,6 +67,52 @@ def find_matches(board_img_path, template_img_path, threshold=0.8):
 
     return matches
 
+def get_lowest_index(matches):
+
+    lowest_x, _ =min(matches,key = lambda x: x[0])
+    _, lowest_y =min(matches,key = lambda x: x[1])
+
+    return lowest_x, lowest_y
+
+def consolidate_matches(matches, row_spacing, col_spacing, lowest_x, lowest_y):
+    
+    # When we use cv.matchTemplate, we'll get a cluster of matches around the "true" match location, since 
+    #   a slight shift in position might not be enough to stop two images from matching. 
+
+    # Therefore, we need to consolidate these matches. Luckily for us, the matches come in dense clusters -- 
+    #   the space between clusters is much larger than the width/height of the clusters.
+
+    # So what we can do is use our row/column spacing and "round" the match locations to integer multiples of this.
+
+    # We need one more trick, which is to subtract all x and y by the first match's x and y. This is to prevent the
+    #   arbitrarily-sized non-board space on the edges from causing our clusters to fall along the midpoint between 
+    #   row and column multiples, which would make points within one cluster get sent (rounded) to multple row/column locations.
+    #   This works because of the dense clusters.
+
+    # use a set to avoid duplicate grid positions
+    consolidated_grid = set()
+    consolidated_board = set()
+
+
+    for x, y in matches:
+        # round to get index on board
+        board_x = round( ( x - lowest_x ) / col_spacing)
+        board_y = round( ( y - lowest_y ) / row_spacing)
+
+        #get idealized grid coordinates 
+        grid_x = board_x * col_spacing
+        grid_y = board_y * row_spacing
+
+        consolidated_grid.add((grid_x, grid_y))
+        consolidated_board.add((board_x, board_y))
+
+    # now that we've eliminated duplicates, we would rather work with a list
+    return list(consolidated_board), list(consolidated_grid)
+
+#HMMM the lowest x and lowest y will differ based on whether im matching black white or intersection... 
+# I can output lowest x,y and correct grid positions later, but is this too weird and clunky? nah honestly that's
+#   probably for the best. this is kind of like transforming vox2world, doing something, then going back world2vox
+
 def find_intersections(image_path, keep_intermediate=False, return_corners=False):
     #from numpy.linalg import LinAlgError
 
