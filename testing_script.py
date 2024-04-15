@@ -6,7 +6,7 @@ black_matches = im.find_matches(r"assets\board_shot.png",r"C:\Users\andre\OneDri
 intersection_matches = im.find_matches(r"assets\board_shot.png",r"C:\Users\andre\OneDrive\Pictures\Screenshots\assets\OGS_intersection_cropped.png")
 white_matches = im.find_matches(r"assets\board_shot.png",r"C:\Users\andre\OneDrive\Pictures\Screenshots\assets\OGS_whitepiece_cropped.png")
 
-allmatches=black_matches.copy() #black matches is getting changed here ... 
+allmatches=black_matches.copy() 
 allmatches.extend(white_matches)
 allmatches.extend(intersection_matches)
 
@@ -30,13 +30,7 @@ for x,y in board_inter:
 
 #importlib.reload(im)
 
-
-
-
 #let's display some things
-    
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors
