@@ -3,6 +3,143 @@ import numpy as np
 import cv2 as cv
 
 
+def get_all_spacing(image_path):
+    """Takes in go board image, finds intersections, and then gets spacing between them.""" 
+
+    from statistics import mode
+    intersections = find_intersections(image_path)
+    rows, columns = group_intersections_by_axis(intersections)
+    row_distances = calculate_spacing(rows)
+    column_distances = calculate_spacing(columns)
+    
+    # Use mode to find the most common distance, assuming minor variations
+    row_spacing = mode(row_distances)
+    column_spacing = mode(column_distances)
+    
+    #print(f"Row spacing: {row_spacing}, Column spacing: {column_spacing}")
+
+    return row_spacing, column_spacing
+
+
+def find_intersections(image_path, keep_intermediate=False, return_corners=False):
+    """Uses opencv probabilistic Hough Lines to find intersections."""
+
+    # Step 1: Read the image
+    img = cv.imread(image_path)
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    # Step 1.5: smooth for more regular edges
+    blurred = cv.GaussianBlur(gray, (5,5), 0)
+
+    if keep_intermediate:
+        #debug
+        cv.imwrite('blurred.png',blurred)
+
+    # Step 2: Edge detection
+    edges = cv.Canny(blurred, 50, 150, apertureSize=3)
+
+    if keep_intermediate:
+        #debug
+        cv.imwrite('edges.png',edges)
+
+    # Step 2.5: dilate and erode
+    dilated = cv.dilate(edges, None, iterations=2)
+
+    edges = cv.erode(dilated, None, iterations=3)
+
+    #the dilation and erosion is good for finding lines, it won't be as good for finding circles
+
+    if keep_intermediate:
+        #debug
+        cv.imwrite('edges_erodil.png',edges)
+
+    # Step 3: Line detection
+    #lines = cv.HoughLines(edges, 1, np.pi / 180, 300)
+    #300 is a good starting place, underestimates slightly. 
+    #might need to use 300, check intersections, if i don't get enough, then decrease
+    #this isn't working very well on a dense board
+
+    #could try houghlines probabilistic
+    lines = cv.HoughLinesP(edges, 1, np.pi / 180, threshold=50, minLineLength=20, maxLineGap=5)
+
+    # i think the probabilistic isn't sampling enough, still getting weird false negatives. need to find out why. 
+
+    # Preparing to find intersections
+    intersections = []
+    corners = []
+    if lines is not None:
+        for i in range(len(lines)):
+            for j in range(i+1, len(lines)):
+                line1 = lines[i][0]
+                line2 = lines[j][0]
+
+                if are_vertical_and_horizontal(line1, line2):
+                    intersection, is_corner = segment_intersection(line1, line2, 3, 3)
+                    if is_corner:
+                        corners.append(intersection)
+                    elif intersection:
+                        intersections.append(intersection)
+    
+    if keep_intermediate:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            cv.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        #debug
+        cv.imwrite('prob_houghlines.png', img)
+
+    if keep_intermediate:
+        # Display intersections on the image
+        for x, y in intersections:
+            cv.circle(img, (x, y), radius=3, color=(0, 0, 255), thickness=-1)        
+        for x, y in corners:
+            cv.circle(img, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
+
+        cv.imwrite('intersections.png', img)
+    if return_corners:
+        return intersections, corners
+    else:
+        intersections.extend(corners)
+        return intersections
+
+
+def group_intersections_by_axis(intersections):
+    # Separate intersections into rows and columns based on their coordinates
+    rows = {}
+    columns = {}
+    for x, y in intersections:
+        # Group by y-coordinate for rows
+        if y not in rows:
+            rows[y] = []
+        rows[y].append((x, y))
+        
+        # Group by x-coordinate for columns
+        if x not in columns:
+            columns[x] = []
+        columns[x].append((x, y))
+    
+    # While the above works, it seems inefficient to store both x and y when one of them is the key. still, this does 
+    #   make for less clunky looking code
+
+    # Sort intersections in each row and column
+    for k in rows:
+        rows[k].sort(key=lambda coord: coord[0])  # Sort by x-coordinate
+    for k in columns:
+        columns[k].sort(key=lambda coord: coord[1])  # Sort by y-coordinate
+    
+    return rows, columns
+
+
+def calculate_spacing(rows_or_columns):
+    distances = []
+    for intersections in rows_or_columns.values():
+        for i in range(len(intersections) - 1):
+            dist = np.linalg.norm(np.array(intersections[i]) - np.array(intersections[i + 1]))
+            distances.append(dist)
+    return distances
+
+
+
 def match_asset_to_board(large_image_path, small_image_paths,return_matched_region=False):
 
     """finds best match and location out of multiple small images. Will help to decide which assets to use."""
@@ -112,88 +249,6 @@ def consolidate_matches(matches, row_spacing, col_spacing, lowest_x, lowest_y):
 #HMMM the lowest x and lowest y will differ based on whether im matching black white or intersection... 
 # I can output lowest x,y and correct grid positions later, but is this too weird and clunky? nah honestly that's
 #   probably for the best. this is kind of like transforming vox2world, doing something, then going back world2vox
-
-def find_intersections(image_path, keep_intermediate=False, return_corners=False):
-    #from numpy.linalg import LinAlgError
-
-    # Step 1: Read the image
-    img = cv.imread(image_path)
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-    # Step 1.5: smooth for more regular edges
-    blurred = cv.GaussianBlur(gray, (5,5), 0)
-
-    if keep_intermediate:
-        #debug
-        cv.imwrite('blurred.png',blurred)
-
-    # Step 2: Edge detection
-    edges = cv.Canny(blurred, 50, 150, apertureSize=3)
-
-    if keep_intermediate:
-        #debug
-        cv.imwrite('edges.png',edges)
-
-    # Step 2.5: dilate and erode
-    dilated = cv.dilate(edges, None, iterations=2)
-
-    edges = cv.erode(dilated, None, iterations=3)
-
-    #the dilation and erosion is good for finding lines, it won't be as good for finding circles
-
-    if keep_intermediate:
-        #debug
-        cv.imwrite('edges_erodil.png',edges)
-
-    # Step 3: Line detection
-    #lines = cv.HoughLines(edges, 1, np.pi / 180, 300)
-    #300 is a good starting place, underestimates slightly. 
-    #might need to use 300, check intersections, if i don't get enough, then decrease
-    #this isn't working very well on a dense board
-
-    #could try houghlines probabilistic
-    lines = cv.HoughLinesP(edges, 1, np.pi / 180, threshold=50, minLineLength=20, maxLineGap=5)
-
-    # i think the probabilistic isn't sampling enough, still getting weird false negatives. need to find out why. 
-
-    # Preparing to find intersections
-    intersections = []
-    corners = []
-    if lines is not None:
-        for i in range(len(lines)):
-            for j in range(i+1, len(lines)):
-                line1 = lines[i][0]
-                line2 = lines[j][0]
-
-                if are_vertical_and_horizontal(line1, line2):
-                    intersection, is_corner = segment_intersection(line1, line2, 3, 3)
-                    if is_corner:
-                        corners.append(intersection)
-                    elif intersection:
-                        intersections.append(intersection)
-    
-    if keep_intermediate:
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
-            cv.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-        #debug
-        cv.imwrite('prob_houghlines.png', img)
-
-    if keep_intermediate:
-        # Display intersections on the image
-        for x, y in intersections:
-            cv.circle(img, (x, y), radius=3, color=(0, 0, 255), thickness=-1)        
-        for x, y in corners:
-            cv.circle(img, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
-
-        cv.imwrite('intersections.png', img)
-    if return_corners:
-        return intersections, corners
-    else:
-        intersections.extend(corners)
-        return intersections
-
 
 
 def find_circles(image_path, row_spacing, column_spacing, keep_intermediate=True):
@@ -311,62 +366,6 @@ def are_vertical_and_horizontal(line1, line2, tolerance=5):
         return False
 
     #might want to base tolerance off image size; these tolerances are kind of large for min line seg length of 20
-
-
-def group_intersections_by_axis(intersections):
-    # Separate intersections into rows and columns based on their coordinates
-    rows = {}
-    columns = {}
-    for x, y in intersections:
-        # Group by y-coordinate for rows
-        if y not in rows:
-            rows[y] = []
-        rows[y].append((x, y))
-        
-        # Group by x-coordinate for columns
-        if x not in columns:
-            columns[x] = []
-        columns[x].append((x, y))
-    
-    # While the above works, it seems inefficient to store both x and y when one of them is the key. still, this does 
-    #   make for less clunky looking code
-
-    # Sort intersections in each row and column
-    for k in rows:
-        rows[k].sort(key=lambda coord: coord[0])  # Sort by x-coordinate
-    for k in columns:
-        columns[k].sort(key=lambda coord: coord[1])  # Sort by y-coordinate
-    
-    return rows, columns
-
-
-def calculate_spacing(rows_or_columns):
-    distances = []
-    for intersections in rows_or_columns.values():
-        for i in range(len(intersections) - 1):
-            dist = np.linalg.norm(np.array(intersections[i]) - np.array(intersections[i + 1]))
-            distances.append(dist)
-    return distances
-
-
-def get_all_spacing(image_path):
-    from statistics import mode
-    intersections = find_intersections(image_path)
-    rows, columns = group_intersections_by_axis(intersections)
-    row_distances = calculate_spacing(rows)
-    column_distances = calculate_spacing(columns)
-    
-    # Use mode to find the most common distance, assuming minor variations
-    row_spacing = mode(row_distances)
-    column_spacing = mode(column_distances)
-    
-    print(f"Row spacing: {row_spacing}, Column spacing: {column_spacing}")
-
-    return row_spacing, column_spacing
-
-
-
-
 
 
 if __name__ == '__main__':
