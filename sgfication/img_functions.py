@@ -1,8 +1,50 @@
 import argparse
 import numpy as np
 import cv2 as cv
+from functools import wraps
 
+def accept_images_or_filenames(num_images=1, color_mode='color'):
+    # quick little decorator to make image file or object inputs easier
+    #need to go through and clean up my functions now
 
+    def decorator(function):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            new_args = []
+            # Determine the color flag based on the color_mode argument
+            color_flag = cv.IMREAD_COLOR if color_mode == 'color' else cv.IMREAD_GRAYSCALE
+
+            for i, arg in enumerate(args):
+                if i < num_images:  # Only convert the first num_images arguments
+                    if isinstance(arg, list):  # Check if the argument is a list
+                        processed_list = []
+                        for item in arg:
+                            if isinstance(item, str):  # Process each item if it's a filename
+                                img = cv2.imread(item, color_flag)
+                                if img is None:
+                                    raise ValueError(f"Could not open or find the image {item}")
+                                processed_list.append(img)
+                            elif isinstance(item, np.ndarray):  # Check if item is an array
+                                processed_list.append(item)
+                            else:
+                                raise TypeError("List items must be file paths or image objects (NumPy arrays)")
+                        new_args.append(processed_list)
+                    elif isinstance(arg, str):  # Process a single string as a file path
+                        img = cv2.imread(arg, color_flag)
+                        if img is None:
+                            raise ValueError(f"Could not open or find the image {arg}")
+                        new_args.append(img)
+                    elif isinstance(arg, np.ndarray):  # Check if arg is an array
+                        new_args.append(arg)
+                    else:
+                        raise TypeError("Argument must be a file path or an image object (NumPy array) or a list of them")
+                else:
+                    new_args.append(arg)
+            return function(*new_args, **kwargs)
+        return wrapper
+    return decorator
+
+@accept_images_or_filenames
 def get_all_spacing(image_path):
     """Takes in go board image, finds intersections, and then gets spacing between them.""" 
 
@@ -21,12 +63,11 @@ def get_all_spacing(image_path):
     return row_spacing, column_spacing
 
 
-def find_intersections(image_path, keep_intermediate=False, return_corners=False):
+def find_intersections(image, keep_intermediate=False, return_corners=False):
     """Uses opencv probabilistic Hough Lines to find intersections."""
 
     # Step 1: Read the image
-    img = cv.imread(image_path)
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
     # Step 1.5: smooth for more regular edges
     blurred = cv.GaussianBlur(gray, (5,5), 0)
@@ -83,19 +124,19 @@ def find_intersections(image_path, keep_intermediate=False, return_corners=False
     if keep_intermediate:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            cv.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         #debug
-        cv.imwrite('prob_houghlines.png', img)
+        cv.imwrite('prob_houghlines.png', image)
 
     if keep_intermediate:
         # Display intersections on the image
         for x, y in intersections:
-            cv.circle(img, (x, y), radius=3, color=(0, 0, 255), thickness=-1)        
+            cv.circle(image, (x, y), radius=3, color=(0, 0, 255), thickness=-1)        
         for x, y in corners:
-            cv.circle(img, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
+            cv.circle(image, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
 
-        cv.imwrite('intersections.png', img)
+        cv.imwrite('intersections.png', image)
     if return_corners:
         return intersections, corners
     else:
@@ -139,25 +180,20 @@ def calculate_spacing(rows_or_columns):
     return distances
 
 
-
-def match_asset_to_board(large_image_path, small_image_paths,return_matched_region=False):
+@accept_images_or_filenames(num_images=2,color_mode='grayscale')
+def match_asset_to_board(large_image, small_image_list,return_matched_region=False):
 
     """finds best match and location out of multiple small images. Will help to decide which assets to use."""
-    
-    # load the large image and convert it to grayscale. 
-    large_image_np = cv.imread(large_image_path,cv.IMREAD_GRAYSCALE)
     
     # initialize variables to keep track of the best match
     best_match_value = -np.inf
     best_match_location = None
     best_match_index = None
     
-    for i, small_image_path in enumerate(small_image_paths):
-        # load the small image, convert it to grayscale
-        small_image_np = cv.imread(small_image_path,cv.IMREAD_GRAYSCALE)
+    for i, small_image in enumerate(small_image_list):
         
         # perform NCC
-        result = cv.matchTemplate(large_image_np, small_image_np, cv.TM_CCORR_NORMED)
+        result = cv.matchTemplate(large_image, small_image, cv.TM_CCORR_NORMED)
         
         # find the peak value and its location
         _, max_value, _, max_loc = cv.minMaxLoc(result)
@@ -166,14 +202,14 @@ def match_asset_to_board(large_image_path, small_image_paths,return_matched_regi
         if max_value > best_match_value:
             best_match_value = max_value
             #top_left_y, top_left_x = np.unravel_index(np.argmax(result), result.shape)
-            best_match_top_left = max_loc
+            best_match_location = max_loc #top left
             best_match_index = i
 
     if return_matched_region:
         # output matched region
-        kernel_w, kernel_h = small_image_np.shape
-        matched_region = large_image_np[best_match_top_left[1]:best_match_top_left[1]+kernel_h, best_match_top_left[0]:best_match_top_left[0] + kernel_w]
-        matched_region_image = cv.cvtColor(matched_region, cv.COLOR_GRAY2BGR)
+        kernel_w, kernel_h = small_image.shape
+        matched_region = large_image[best_match_location[1]:best_match_location[1]+kernel_h, best_match_location[0]:best_match_location[0] + kernel_w]
+        matched_region_image = cv.cvtColor(matched_region, cv.COLOR_GRAY2BGR) #do i want this line
 
         return best_match_index, best_match_location, matched_region_image
     else:
@@ -181,10 +217,9 @@ def match_asset_to_board(large_image_path, small_image_paths,return_matched_regi
         return best_match_index, best_match_location
     
 
+@accept_images_or_filenames(num_images=2,color_mode='grayscale')
+def find_matches(board_img, template_img, threshold=0.8):
 
-def find_matches(board_img_path, template_img_path, threshold=0.8):
-    board_img = cv.imread(board_img_path, 0)  # Load the board image in grayscale
-    template_img = cv.imread(template_img_path, 0)  # Load the template image in grayscale
     w, h = template_img.shape[::-1]  # Get the dimensions of the template
 
     # Perform template matching
@@ -250,14 +285,13 @@ def consolidate_matches(matches, row_spacing, col_spacing, lowest_x, lowest_y):
 # I can output lowest x,y and correct grid positions later, but is this too weird and clunky? nah honestly that's
 #   probably for the best. this is kind of like transforming vox2world, doing something, then going back world2vox
 
-
-def find_circles(image_path, row_spacing, column_spacing, keep_intermediate=True):
+@accept_images_or_filenames(num_images=1,color_mode='color')
+def find_circles(image, row_spacing, column_spacing, keep_intermediate=True):
 
     #recycling this from intersections code
 
     # Step 1: Read the image
-    img = cv.imread(image_path)
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
     # Step 1.5: smooth for more regular edges
     blurred = cv.GaussianBlur(gray, (5,5), 0)
@@ -294,9 +328,9 @@ def find_circles(image_path, row_spacing, column_spacing, keep_intermediate=True
         circles = np.round(circles[0, :]).astype("int")    
 
         for (x, y, r) in circles:
-            cv.circle(img, (x, y), r, (0, 255, 0), 2)
+            cv.circle(image, (x, y), r, (0, 255, 0), 2)
     
-    cv.imwrite('circles.png', img)
+    cv.imwrite('circles.png', image)
     return circles
 
 # Helper functions section

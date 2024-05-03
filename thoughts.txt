@@ -18,7 +18,16 @@ Details
     find edges
     find lines 
 
-newest thoughts:
+5/1 thoughts: 
+I need to refactor some functions to take img objects rather than paths. 
+
+Need to use unicorn to test out whether my fastapi stuff is working
+
+then need to dockerize it all 
+
+maybe i could use decorators to have some of my functions take in file names or image objects? is that a good idea
+
+old-new thoughts:
 
 It's time to use assets to drag me across the finish line. Corner screenshots included, probably
 
@@ -32,6 +41,7 @@ should dockerize it
 
 I think it's best if all the functions just take in image arrays rather than filenames, i should refactor
 
+matplotlib might not need to be a dependency
 
 old thoughts:
 
