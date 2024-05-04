@@ -9,6 +9,7 @@ def accept_images_or_filenames(num_images=1, color_mode='color'):
 
     def decorator(function):
         @wraps(function)
+
         def wrapper(*args, **kwargs):
             new_args = []
             # Determine the color flag based on the color_mode argument
@@ -20,7 +21,7 @@ def accept_images_or_filenames(num_images=1, color_mode='color'):
                         processed_list = []
                         for item in arg:
                             if isinstance(item, str):  # Process each item if it's a filename
-                                img = cv2.imread(item, color_flag)
+                                img = cv.imread(item, color_flag)
                                 if img is None:
                                     raise ValueError(f"Could not open or find the image {item}")
                                 processed_list.append(img)
@@ -30,7 +31,7 @@ def accept_images_or_filenames(num_images=1, color_mode='color'):
                                 raise TypeError("List items must be file paths or image objects (NumPy arrays)")
                         new_args.append(processed_list)
                     elif isinstance(arg, str):  # Process a single string as a file path
-                        img = cv2.imread(arg, color_flag)
+                        img = cv.imread(arg, color_flag)
                         if img is None:
                             raise ValueError(f"Could not open or find the image {arg}")
                         new_args.append(img)
@@ -44,10 +45,10 @@ def accept_images_or_filenames(num_images=1, color_mode='color'):
         return wrapper
     return decorator
 
-@accept_images_or_filenames
+@accept_images_or_filenames()
 def get_all_spacing(image_path):
     """Takes in go board image, finds intersections, and then gets spacing between them.""" 
-
+    
     from statistics import mode
     intersections = find_intersections(image_path)
     rows, columns = group_intersections_by_axis(intersections)
