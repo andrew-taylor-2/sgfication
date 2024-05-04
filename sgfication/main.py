@@ -12,11 +12,9 @@ async def analyze_image(file: UploadFile = File(...)):
         image_data = await file.read()
         image_array = np.fromstring(image_data, np.uint8)
         image = cv.imdecode(image_array, cv.IMREAD_COLOR)
-
         # Save temporary image to disk to use with the existing function
         temp_img_path = 'temp_image.jpg'
         cv.imwrite(temp_img_path, image)
-
         # Call the function from img_functions.py
         row_spacing, column_spacing = get_all_spacing(temp_img_path)
         return {"row_spacing": row_spacing, "column_spacing": column_spacing}
