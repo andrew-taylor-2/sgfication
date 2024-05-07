@@ -28,6 +28,7 @@ PyQt5==5.15.10
 PyQt5-sip==12.13.0
 python-dateutil==2.8.2
 python-dotenv==1.0.1
+python-multipart==0.0.9
 PyYAML==6.0.1
 scipy==1.12.0
 setuptools==68.2.2
