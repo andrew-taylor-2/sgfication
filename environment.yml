@@ -1,4 +1,4 @@
-name: c:\Users\andre\Software\Repos\sgfication\.conda
+name: sgfenv
 channels:
   - defaults
 dependencies:
