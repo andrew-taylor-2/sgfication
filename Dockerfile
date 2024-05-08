@@ -7,21 +7,8 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Create a conda environment
-RUN conda create -n myenv python=3.12
-
-# Activate the environment
-SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
-
-# Get the one pesky package I can't get with pip
-RUN conda install -c intel mkl_fft
-
-# use conda for some other packages where it could possibly help
-RUN conda install numpy opencv
-
-# Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+# Install any needed packages specified in environment.yml
+RUN conda env create -f environment.yml
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
