@@ -59,8 +59,6 @@ dependencies:
   - tk
   - tornado
   - tzdata
-  - vc
-  - vs2015_runtime
   - wheel
   - xz
   - zlib
