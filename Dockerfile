@@ -1,6 +1,11 @@
 # Start from a base image with Conda preinstalled
 FROM continuumio/miniconda3
 
+# Install system dependencies for opencv
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container
 WORKDIR /app
 
@@ -17,4 +22,4 @@ EXPOSE 8000
 ENV NAME World
 
 # Run the Uvicorn server for the FastAPI app
-CMD ["conda", "run", "-n", "myenv", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["conda", "run", "--no-capture-output", "-n", "sgfenv", "uvicorn", "sgfication.main:app", "--host", "0.0.0.0", "--port", "8000"]
