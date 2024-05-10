@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from img_functions import get_all_spacing
+from sgfication.img_functions import get_all_spacing
 import numpy as np
 import cv2 as cv
 
