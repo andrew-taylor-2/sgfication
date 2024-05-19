@@ -33,10 +33,13 @@
 	height: 100%;
 	line-height: normal;
 	font-size: 16px;
+	text-align: left; /* added by Andrew -- normally inherits t-a:center from root */
 	position: relative;
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
 	-webkit-tap-highlight-color: transparent; /* For some Androids */
 }
+
+  
 
 .wgo-player-main:after {
 	content: "";
