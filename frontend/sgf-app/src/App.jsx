@@ -4,6 +4,7 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import About from './components/About';
 import Upload from './components/Upload';
+import Board from './components/Board';
 import './App.css';
 
 function App() {
@@ -23,11 +24,15 @@ function App() {
             <li>
               <Link to="/upload">Upload</Link>
             </li>
+            <li>
+              <Link to="/board">Board</Link>
+            </li>
           </ul>
         </nav>
         <Routes>
           <Route path="/about" element={<About />} />
           <Route path="/upload" element={<Upload />} />
+          <Route path="/board" element={<Board />} />
           <Route path="/" element={<Home count={count} setCount={setCount} />} />
         </Routes>
       </div>
