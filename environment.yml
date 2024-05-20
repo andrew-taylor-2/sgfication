@@ -80,6 +80,7 @@ dependencies:
       - python-multipart
       - pyyaml
       - scipy
+      - sgfmill
       - sniffio
       - starlette
       - typing-extensions
