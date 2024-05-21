@@ -402,6 +402,46 @@ def are_vertical_and_horizontal(line1, line2, tolerance=5):
 
     #might want to base tolerance off image size; these tolerances are kind of large for min line seg length of 20
 
+def create_sgf(bool_white,bool_black):
+    """"Creates an SGF file from boolean board representation"""
+
+    # There will be an error from sgfmill if the go position isn't legal. Need to deal with that.
+
+    from sgfmill import sgf, boards
+    
+    board_size = bool_black.shape[0]
+    assert board_size == 19  # Ensure it's a 19x19 board
+
+    # Create a new SGF game record
+    game = sgf.Sgf_game(board_size)
+
+    # Create a board
+    board = boards.Board(board_size)
+
+    #
+    #root = game.get_root()
+
+    # Add stones to the board
+    for row in range(board_size):
+        for col in range(board_size):
+            if bool_black[row, col]:
+                node = game.extend_main_sequence()
+                node.set_move('b', (row,col))
+                
+                board.play(row, col, 'b')
+            elif bool_white[row, col]:
+                board.play(row, col, 'w')
+                node = game.extend_main_sequence()
+                node.set_move('w', (row,col))
+    return game
+
+def save_sgf(sgfgame,outname):
+
+    # Save the SGF file
+    with open(outname, "wb") as f:
+        f.write(sgfgame.serialise())
+
+
 
 if __name__ == '__main__':
 

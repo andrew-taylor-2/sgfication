@@ -1,4 +1,5 @@
 from sgfication import img_functions as im
+import numpy as np
 
 rowss,columnss=im.get_all_spacing(r"assets\board_shot.png")
 
@@ -28,10 +29,10 @@ bool_inter=np.zeros((19,19),dtype=bool)
 for x,y in board_inter:
     bool_inter[x,y]=True
 
+#import importlib
 #importlib.reload(im)
 
-#let's display some things
-import numpy as np
+### let's display some things
 import matplotlib.pyplot as plt
 import matplotlib.colors
 
@@ -67,3 +68,8 @@ plt.xlim(-0.5, 18.5)
 plt.ylim(18.5, -0.5)
 
 plt.show()
+
+
+### let's create some SGFs
+sgfgame = im.create_sgf(bool_white, bool_black)
+im.save_sgf(sgfgame,"../test.sgf")
