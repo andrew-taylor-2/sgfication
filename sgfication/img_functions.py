@@ -421,18 +421,26 @@ def create_sgf(bool_white,bool_black):
     #
     #root = game.get_root()
 
-    # Add stones to the board
+    # Play all black stones
     for row in range(board_size):
         for col in range(board_size):
             if bool_black[row, col]:
-                node = game.extend_main_sequence()
-                node.set_move('b', (row,col))
-                
                 board.play(row, col, 'b')
-            elif bool_white[row, col]:
+
+    # Play all white stones
+    for row in range(board_size):
+        for col in range(board_size):
+            if bool_white[row, col]:
                 board.play(row, col, 'w')
-                node = game.extend_main_sequence()
-                node.set_move('w', (row,col))
+
+
+    # let's do this a different way
+    stones = {'b' : set(), 'w' : set()}
+    for color, point in board.list_occupied_points():
+        stones[color].add(point)
+
+    game.get_root().set_setup_stones(stones['b'], stones['w'])
+
     return game
 
 def save_sgf(sgfgame,outname):

@@ -72,4 +72,4 @@ plt.show()
 
 ### let's create some SGFs
 sgfgame = im.create_sgf(bool_white, bool_black)
-im.save_sgf(sgfgame,"../test.sgf")
+im.save_sgf(sgfgame,"../test3.sgf")
