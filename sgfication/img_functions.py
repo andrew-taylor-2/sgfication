@@ -7,6 +7,8 @@ def accept_images_or_filenames(num_images=1, color_mode='color'):
     # quick little decorator to make image file or object inputs easier
     #need to go through and clean up my functions now
 
+    #note that this doesn't convert color image inputs to gray, even if color_mode='grayscale'
+
     def decorator(function):
         @wraps(function)
 
@@ -64,11 +66,11 @@ def get_all_spacing(image_path):
     return row_spacing, column_spacing
 
 
-def find_intersections(image, keep_intermediate=False, return_corners=False):
+def find_intersections(gray, keep_intermediate=False, return_corners=False):
     """Uses opencv probabilistic Hough Lines to find intersections."""
 
     # Step 1: Read the image
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    #gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
     # Step 1.5: smooth for more regular edges
     blurred = cv.GaussianBlur(gray, (5,5), 0)
@@ -125,19 +127,19 @@ def find_intersections(image, keep_intermediate=False, return_corners=False):
     if keep_intermediate:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            cv.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv.line(gray, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         #debug
-        cv.imwrite('prob_houghlines.png', image)
+        cv.imwrite('prob_houghlines.png', gray)
 
     if keep_intermediate:
         # Display intersections on the image
         for x, y in intersections:
-            cv.circle(image, (x, y), radius=3, color=(0, 0, 255), thickness=-1)        
+            cv.circle(gray, (x, y), radius=3, color=(0, 0, 255), thickness=-1)        
         for x, y in corners:
-            cv.circle(image, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
+            cv.circle(gray, (x, y), radius=3, color=(255, 0, 0), thickness=-1)
 
-        cv.imwrite('intersections.png', image)
+        cv.imwrite('intersections.png', gray)
     if return_corners:
         return intersections, corners
     else:
@@ -286,16 +288,16 @@ def consolidate_matches(matches, row_spacing, col_spacing, lowest_x, lowest_y):
 # I can output lowest x,y and correct grid positions later, but is this too weird and clunky? nah honestly that's
 #   probably for the best. this is kind of like transforming vox2world, doing something, then going back world2vox
 
-@accept_images_or_filenames(num_images=1,color_mode='color')
+@accept_images_or_filenames(num_images=1,color_mode='grayscale')
 def find_circles(image, row_spacing, column_spacing, keep_intermediate=True):
 
     #recycling this from intersections code
 
     # Step 1: Read the image
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    #gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
     # Step 1.5: smooth for more regular edges
-    blurred = cv.GaussianBlur(gray, (5,5), 0)
+    blurred = cv.GaussianBlur(image, (5,5), 0)
 
     if keep_intermediate:
         #debug
