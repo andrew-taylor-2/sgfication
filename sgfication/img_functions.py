@@ -221,7 +221,7 @@ def match_asset_to_board(large_image, small_image_list,return_matched_region=Fal
     
 
 @accept_images_or_filenames(num_images=2,color_mode='grayscale')
-def find_matches(board_img, template_img, threshold=0.8):
+def find_matches(board_img, template_img, threshold=0.8,visualize=True):
 
     w, h = template_img.shape[::-1]  # Get the dimensions of the template
 
@@ -232,11 +232,14 @@ def find_matches(board_img, template_img, threshold=0.8):
     matches = []
     for pt in zip(*loc[::-1]):  # Switch x and y coordinates
         matches.append(pt)
-        # Optional: for visualization
-        cv.rectangle(board_img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-    
+        
+    if visualize:
+        board_img_cp = board_img.copy() # dont want to affect input
+        for pt in matches:
+            cv.rectangle(board_img_cp, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+
     # Optional: Show the result
-    cv.imshow('Detected', board_img)
+    cv.imshow('Detected', board_img_cp)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
