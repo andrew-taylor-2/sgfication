@@ -24,3 +24,5 @@ with open(image_path, 'rb') as image_file:
 
 # response = requests.post(url, files=files)
 # print(response.text)
+
+# ["conda", "run", "--no-capture-output", "-n", "sgfenv", "uvicorn", "sgfication.main:app", "--host", "0.0.0.0", "--port", "8000"]
