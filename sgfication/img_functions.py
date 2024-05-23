@@ -238,10 +238,10 @@ def find_matches(board_img, template_img, threshold=0.8,visualize=True):
         for pt in matches:
             cv.rectangle(board_img_cp, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
 
-    # Optional: Show the result
-    cv.imshow('Detected', board_img_cp)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+        # Optional: Show the result
+        cv.imshow('Detected', board_img_cp)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
 
     return matches
 
