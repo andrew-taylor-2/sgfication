@@ -1,4 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sgfication.img_functions import get_all_spacing, find_matches, get_lowest_index, consolidate_matches, create_sgf
 import numpy as np
 import cv2 as cv
@@ -53,7 +55,19 @@ async def analyze_image(file: UploadFile = File(...)):
         #    bool_inter[x,y]=True
 
         sgfgame = create_sgf(bool_white, bool_black)
-        print(sgfgame.serialise().decode('utf-8'))
+        sgf_data = sgfgame.serialise().decode('utf-8')
+        print(sgf_data)
+        return JSONResponse(content={"sgf": sgf_data})
 
     else:
         raise HTTPException(status_code=400, detail="File provided is not an image.")
+    
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Adjust this to your frontend's URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
