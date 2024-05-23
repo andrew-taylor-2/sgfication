@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Upload() {
+function Upload({ setSgfData }) {
   const [file, setFile] = useState(null);
-  const [visualization, setVisualization] = useState(null);
+  const navigate = useNavigate();
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -14,12 +15,13 @@ function Upload() {
     formData.append("file", file);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/analyze/', formData, {
+      const response = await axios.post('http://127.0.0.1:8000/analyze/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setVisualization(response.data); // Assuming the server sends back the visualization URL or data
+      setSgfData(response.data.sgf);
+      navigate('/board');
     } catch (error) {
       console.error('Error uploading file:', error);
     }
@@ -30,7 +32,6 @@ function Upload() {
       <h2>Upload File</h2>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleFileUpload}>Upload</button>
-      {visualization && <img src={visualization} alt="Visualization" />}
     </div>
   );
 }

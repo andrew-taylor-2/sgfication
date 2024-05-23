@@ -8,6 +8,7 @@ import Board from './components/Board';
 import './App.css';
 
 function App() {
+  const [sgfData, setSgfData] = useState(null);
   const [count, setCount] = useState(0);
 
   return (
@@ -31,8 +32,8 @@ function App() {
         </nav>
         <Routes>
           <Route path="/about" element={<About />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/board" element={<Board />} />
+          <Route path="/upload" element={<Upload setSgfData={setSgfData} />} />
+          <Route path="/board" element={<Board sgfData={sgfData} />} />
           <Route path="/" element={<Home count={count} setCount={setCount} />} />
         </Routes>
       </div>
