@@ -14,6 +14,7 @@ SGFication is an app that takes Go board screenshots and places the detected pos
 - **JavaScript/React/CSS**: Frontend interaction and visualization.
 - **Node.js**: Server-side runtime environment to handle web server logic.
 - **WGO.js**: JavaScript library used for board display and interaction on the web frontend. Their code [here](https://github.com/waltheri/wgo.js/)
+- **Docker**: Docker files are included here, coming to Docker Hub soon.
 
 ## Setup Instructions
 
@@ -21,6 +22,7 @@ SGFication is an app that takes Go board screenshots and places the detected pos
 2. **Backend Setup**:
    - Create and activate the Conda environment: `conda env create -f environment.yml && conda activate sgfenv`
    - Start the server: `conda run --no-capture-output -n sgfenv uvicorn sgfication.main:app --host 0.0.0.0 --port 8000`
+   - Docker: Backend image will be pushed to Docker Hub soon, simplifying setup.
 3. **Frontend Setup**:
    - Navigate to the frontend directory: `cd frontend/sgf-app`
    - Install dependencies: `npm install`
