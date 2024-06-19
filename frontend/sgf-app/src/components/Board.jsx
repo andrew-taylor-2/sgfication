@@ -53,7 +53,6 @@ const Board = ({ sgfData }) => {
 
   return (
     <div>
-      <h1>WGo.js Player Demo</h1>
       <div id="board" style={{ width: '150%', margin: '0 auto' }}>
         Your browser doesn't support WGo Player. Use a modern browser like IE9, Google Chrome, or Mozilla Firefox.
       </div>
