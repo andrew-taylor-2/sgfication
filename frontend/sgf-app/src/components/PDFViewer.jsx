@@ -1,39 +1,16 @@
-// PDFViewer.jsx
+import React from 'react';
+import { Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css'; // Styles for the viewer
+import '@react-pdf-viewer/default-layout/lib/styles/index.css'; // Styles for the default layout
 
-import React, { useEffect } from 'react';
-import { getDocument } from 'pdfjs-dist/build/pdf';
-import { PDFViewer } from 'pdfjs-dist/web/pdf_viewer';
-
-const PDFViewerComponent = ({ pdfUrl }) => {
-  useEffect(() => {
-    const pdfViewer = new PDFViewer({
-      container: document.getElementById('pdfViewerContainer')
-    });
-
-    // Load the PDF document
-    const loadPDF = async () => {
-      try {
-        const pdf = await getDocument(pdfUrl).promise;
-        pdfViewer.setDocument(pdf);
-      } catch (error) {
-        console.error('Error loading PDF:', error);
-      }
-    };
-
-    loadPDF();
-
-    // Cleanup function
-    return () => {
-      // Clean up PDF viewer instance
-      pdfViewer.cleanup();
-    };
-  }, [pdfUrl]);
+const PDFViewer = () => {
+  const pdfUrl = '../../public/resume.pdf';
 
   return (
-    <div id="pdfViewerContainer" style={{ width: '100%', height: '100vh' }}>
-      {/* This div will contain the PDF viewer */}
+    <div style={{ height: '100vh' }}>
+      <Viewer fileUrl={pdfUrl} />
     </div>
   );
 };
 
-export default PDFViewerComponent;
+export default PDFViewer;
