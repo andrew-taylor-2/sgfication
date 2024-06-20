@@ -15,7 +15,7 @@ const globalStyles = (
   <GlobalStyles
     styles={{
       body: {
-        backgroundColor: '#464646', // Off-white/silvery background
+        backgroundColor: '#646464',//'#464646', // Off-white/silvery background
         margin: 0,
         padding: 0,
         fontFamily: 'Roboto, sans-serif',
@@ -52,26 +52,7 @@ function App() {
 function Home({ count, setCount }) {
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      
     </>
   );
 }
