@@ -50,10 +50,9 @@ async def analyze_image(file: UploadFile = File(...)):
         for x,y in board_black:
             bool_black[x,y]=True
 
-        #bool_inter=np.zeros((19,19),dtype=bool)
-        #for x,y in board_inter:
-        #    bool_inter[x,y]=True
-
+        #rotate render by 90 degrees here
+        bool_white = np.rot90(bool_white)
+        bool_black = np.rot90(bool_black)
         sgfgame = create_sgf(bool_white, bool_black)
         sgf_data = sgfgame.serialise().decode('utf-8')
         print(sgf_data)
