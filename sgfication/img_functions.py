@@ -455,7 +455,6 @@ def save_sgf(sgfgame,outname):
         f.write(sgfgame.serialise())
 
 
-
 if __name__ == '__main__':
 
     #IVE MADE SOME CHANGES AND NEED TO UPDATE ARGPARSER
