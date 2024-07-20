@@ -26,3 +26,6 @@ with open(image_path, 'rb') as image_file:
 # print(response.text)
 
 # ["conda", "run", "--no-capture-output", "-n", "sgfenv", "uvicorn", "sgfication.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# conda run --no-capture-output -n sgfenv uvicorn sgfication.main:app --host 0.0.0.0 --port 8000
+#okay the above is what you run in the docker container. outside of this, run
+# conda run --no-capture-output uvicorn sgfication.main:app --host 0.0.0.0 --port 8000
