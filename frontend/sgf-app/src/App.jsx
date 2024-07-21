@@ -6,6 +6,7 @@ import viteLogo from '/vite.svg';
 // import NavTabs from './components/NavTabs';
 import NavDrawer from './components/NavDrawer';
 import About from './components/About';
+import Bio from './components/Bio';
 import Upload from './components/Upload';
 import Board from './components/Board';
 import './App.css';
@@ -39,6 +40,7 @@ function App() {
           <Toolbar />
         <Routes>
           <Route path="/about" element={<About />} />
+          <Route path="/bio" element={<Bio />} />
           <Route path="/upload" element={<Upload setSgfData={setSgfData} />} />
           <Route path="/board" element={<Board sgfData={sgfData} />} />
           <Route path="/" element={<Home count={count} setCount={setCount} />} />
