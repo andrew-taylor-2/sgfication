@@ -16,12 +16,21 @@ const globalStyles = (
 );
 
 const content = [
+  
   {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.",
-    img: "../../public/biopics/pic1.png",
+    img: "../../public/biopics/pic0.png",
+    fullWidth: true,
   },
   {
-    text: "Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin.",
+    text: "Hi, I'm Andrew Taylor! Based in Atlanta, I have been finding solutions in medical image analysis, whether that is statistical analysis, complex image manipulations, generalizing and updating legacy code, or leveraging the field's cutting-edge software tools. I've especially enjoyed finding difficult technical solutions, which has led me to pivot into seeking out software development roles.",
+    fullWidth: true,
+  },
+  {
+    text: "For the last 4 years I've conducted brain research in NASA astronauts and in terrestrial spaceflight analogues. This has resulted in my authorship on 4 papers and presentation at NASA's Human Research Program Investigator's Workshop. \n \nblahhhh",
+    img: "../../public/biopics/braingif.gif",
+  },
+  {
+    text: "",
     img: "../../public/biopics/pic2.png",
   },
   {
