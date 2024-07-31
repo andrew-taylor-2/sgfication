@@ -18,6 +18,15 @@ Details
     find edges
     find lines 
 
+5/30 thoughts:
+need to turn the render by 90 degrees
+screenshot is very sensitive to window being too small
+i'd love to do this without assets
+
+5/19 thoughts:
+If i just add the actual SGFication of the board representation to the backend, I have nearly the full service. Then i can
+    make the upload button work and render it on the board i already have.
+
 5/10 thoughts:
 I implemented most of my 5/1 thoughts. woo
 
