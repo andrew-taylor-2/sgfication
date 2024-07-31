@@ -8,9 +8,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      preact: 'react',
-      'preact/hooks': 'react',
-      'pdfjs-dist': path.resolve(__dirname, 'node_modules/pdfjs-dist'),
+      'pdfjs-dist': path.resolve(__dirname, 'node_modules/pdfjs-dist')
     }
   }
-});
+}); // I"m NOT aliasing preact to react like in the sabaki install instructions -- i this causes issues down the line then change it back
