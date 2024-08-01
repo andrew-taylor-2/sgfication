@@ -5,36 +5,44 @@ import sgf from '@sabaki/sgf'; // Import the SGF parser
 
 const Board = ({ sgfData }) => {
   const [signMap, setSignMap] = useState([]);
-
   useEffect(() => {
     const parseSGF = (sgfData) => {
       const collection = sgf.parse(sgfData);
-      const gameTree = collection.gameTrees[0];
-      const rootNode = gameTree.nodes[0];
-      const boardSize = rootNode.SZ[0];
+      const gameTree = collection[0];
+      const rootNode = gameTree.data;
+      const boardSize = parseInt(rootNode.SZ[0]);
       const signMap = Array.from({ length: boardSize }, () => Array(boardSize).fill(0)); // Initialize a 2D array with 0 (empty)
 
-      gameTree.nodes.forEach((node) => {
-        if (node.B) {
-          const [x, y] = node.B[0];
-          signMap[x][y] = 1; // Black stone
-        } else if (node.W) {
-          const [x, y] = node.W[0];
-          signMap[x][y] = -1; // White stone
-        }
-      });
+      const parseCoordinates = (coords) => {
+        return coords.map(coord => {
+          const x = coord.charCodeAt(0) - 97;
+          const y = coord.charCodeAt(1) - 97;
+          return [x, y];
+        });
+      };
+
+      if (rootNode.AB) {
+        parseCoordinates(rootNode.AB).forEach(([x, y]) => {
+          signMap[y][x] = 1; // Black stones
+        });
+      }
+
+      if (rootNode.AW) {
+        parseCoordinates(rootNode.AW).forEach(([x, y]) => {
+          signMap[y][x] = -1; // White stones
+        });
+      }
 
       return signMap;
     };
 
-    if (sgfData) {
-      setSignMap(parseSGF(sgfData));
-    }
+    const newSignMap = parseSGF(sgfData);
+    setSignMap(newSignMap);
   }, [sgfData]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ width: '500px', height: '500px' }}> {/* Set the desired size */}
+    <div>
+      <div>
         <Goban vertexSize={24} signMap={signMap} />
       </div>
     </div>
