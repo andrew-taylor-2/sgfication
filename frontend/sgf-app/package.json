@@ -16,6 +16,7 @@
     "@mui/material": "^5.15.20",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
+    "@sabaki/go-board": "^1.4.3",
     "@sabaki/sgf": "^3.4.7",
     "@sabaki/shudan": "^1.7.1",
     "@types/pdfjs-dist": "^2.10.378",
