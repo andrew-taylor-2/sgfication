@@ -81,7 +81,7 @@ const Board = ({ sgfData }) => {
         </label>
         {/* Add other checkboxes as needed */}
       </form>
-
+      <div onContextMenu={(evt) => evt.preventDefault() }> 
       <div>
         <Goban
           vertexSize={vertexSize}
@@ -110,6 +110,7 @@ const Board = ({ sgfData }) => {
             }
           `}</style>
         )}
+      </div>
       </div>
     </div>
   );
