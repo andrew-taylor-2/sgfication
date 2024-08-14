@@ -13,8 +13,8 @@ const Board = ({ sgfData }) => {
   const [showCoordinates, setShowCoordinates] = useState(false);
   const [alternateCoordinates, setAlternateCoordinates] = useState(false);
   const [showCorner, setShowCorner] = useState(false);
-  const [fuzzyStonePlacement, setFuzzyStonePlacement] = useState(false);
-  const [animateStonePlacement, setAnimateStonePlacement] = useState(false);
+  const [fuzzyStonePlacement, setFuzzyStonePlacement] = useState(true);
+  const [animateStonePlacement, setAnimateStonePlacement] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
 
   useEffect(() => {
