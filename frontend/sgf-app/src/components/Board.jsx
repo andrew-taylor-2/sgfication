@@ -11,7 +11,6 @@ const Board = ({ sgfData }) => {
   const [signMap, setSignMap] = useState(defaultSignMap);
   const [vertexSize, setVertexSize] = useState(24);
   const [showCoordinates, setShowCoordinates] = useState(false);
-  const [alternateCoordinates, setAlternateCoordinates] = useState(false);
   const [showCorner, setShowCorner] = useState(false);
   const [fuzzyStonePlacement, setFuzzyStonePlacement] = useState(true);
   const [animateStonePlacement, setAnimateStonePlacement] = useState(true);
@@ -72,10 +71,6 @@ const Board = ({ sgfData }) => {
           Show coordinates
         </label>
         <label>
-          <input type="checkbox" checked={alternateCoordinates} onChange={() => setAlternateCoordinates(!alternateCoordinates)} />
-          Alternate coordinates
-        </label>
-        <label>
           <input type="checkbox" checked={isBusy} onChange={() => setIsBusy(!isBusy)} />
           Busy
         </label>
@@ -89,8 +84,6 @@ const Board = ({ sgfData }) => {
           busy={isBusy}
           rangeX={showCorner ? [8, 18] : undefined}
           rangeY={showCorner ? [12, 18] : undefined}
-          coordX={alternateCoordinates ? (i) => chineseCoord[i] : undefined}
-          coordY={alternateCoordinates ? (i) => i + 1 : undefined}
           signMap={signMap}
           showCoordinates={showCoordinates}
           fuzzyStonePlacement={fuzzyStonePlacement}
@@ -103,13 +96,6 @@ const Board = ({ sgfData }) => {
             setSignMap(nBm.signMap);
           }}
         />
-        {alternateCoordinates && (
-          <style>{`
-            .shudan-coordx span {
-              font-size: .45em;
-            }
-          `}</style>
-        )}
       </div>
       </div>
     </div>
