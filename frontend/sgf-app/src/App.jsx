@@ -41,8 +41,7 @@ function App() {
         <Routes>
           <Route path="/about" element={<About />} />
           <Route path="/bio" element={<Bio />} />
-          <Route path="/upload" element={<Upload setSgfData={setSgfData} />} />
-          <Route path="/board" element={<Board sgfData={sgfData} />} />
+          <Route path="/board" element={<Board sgfData={sgfData} setSgfData={setSgfData} />} />
           <Route path="/" element={<Home count={count} setCount={setCount} />} />
         </Routes>
         </Box>

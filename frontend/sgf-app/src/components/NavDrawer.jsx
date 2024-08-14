@@ -74,9 +74,6 @@ function NavDrawer() {
           <ListItem button component={StyledLink} to="/about" selected={currentPath === '/about'}>
             <ListItemText primary="About" />
           </ListItem>
-          <ListItem button component={StyledLink} to="/upload" selected={currentPath === '/upload'}>
-            <ListItemText primary="Upload" />
-          </ListItem>
           <ListItem button component={StyledLink} to="/board" selected={currentPath === '/board'}>
             <ListItemText primary="Board" />
           </ListItem>

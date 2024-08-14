@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Goban } from '@sabaki/shudan';
 import '@sabaki/shudan/css/goban.css';
 import sgf from '@sabaki/sgf'; // SGF parser
-import GoBoard from "@sabaki/go-board" // board class
+import GoBoard from "@sabaki/go-board"; // board class
+import axios from 'axios'; // Import axios for file upload
 
 const defaultBoardSize = 19;
 const defaultSignMap = Array.from({ length: defaultBoardSize }, () => Array(defaultBoardSize).fill(0));
 
-const Board = ({ sgfData }) => {
+const Board = () => {
   const [signMap, setSignMap] = useState(defaultSignMap);
   const [vertexSize, setVertexSize] = useState(24);
   const [showCoordinates, setShowCoordinates] = useState(false);
@@ -15,6 +16,9 @@ const Board = ({ sgfData }) => {
   const [fuzzyStonePlacement, setFuzzyStonePlacement] = useState(true);
   const [animateStonePlacement, setAnimateStonePlacement] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
+  const [file, setFile] = useState(null); // State for file upload
+  const [sgfData, setSgfData] = useState(null);
+
 
   useEffect(() => {
     if (sgfData) {
@@ -52,6 +56,26 @@ const Board = ({ sgfData }) => {
       setSignMap(newSignMap);
     }
   }, [sgfData]);
+
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleFileUpload = async () => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/analyze/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setSgfData(response.data.sgf);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '15em auto', gridColumnGap: '1em' }}>
@@ -96,6 +120,11 @@ const Board = ({ sgfData }) => {
             setSignMap(nBm.signMap);
           }}
         />
+      </div>
+      <div style={{ marginTop: '1em' }}> {/* File upload section */}
+        <h2>Upload a picture of a Go board to continue play here!</h2>
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={handleFileUpload}>Upload</button>
       </div>
       </div>
     </div>
