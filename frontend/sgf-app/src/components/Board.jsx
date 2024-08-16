@@ -4,6 +4,7 @@ import '@sabaki/shudan/css/goban.css';
 import sgf from '@sabaki/sgf'; // SGF parser
 import GoBoard from "@sabaki/go-board"; // board class
 import axios from 'axios'; // Import axios for file upload
+import saveSubmission from '../../pg_server.js'
 
 const defaultBoardSize = 19;
 const defaultSignMap = Array.from({ length: defaultBoardSize }, () => Array(defaultBoardSize).fill(0));
@@ -72,6 +73,10 @@ const Board = () => {
         }
       });
       setSgfData(response.data.sgf);
+
+      // put in db
+      await saveSubmission(file.name, response.data.sgf)
+
     } catch (error) {
       console.error('Error uploading file:', error);
     }
