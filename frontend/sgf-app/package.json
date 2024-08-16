@@ -22,6 +22,7 @@
     "@types/pdfjs-dist": "^2.10.378",
     "axios": "^1.6.8",
     "pdfjs-dist": "^3.11.174",
+    "pg": "^8.12.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.1"
