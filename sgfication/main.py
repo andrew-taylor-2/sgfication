@@ -8,7 +8,6 @@ import cv2 as cv
 import asyncpg
 import os
 from dotenv import load_dotenv
-import datetime
 
 
 app = FastAPI()
@@ -77,9 +76,9 @@ async def save_to_db(filename: str, sgf_data: str):
     conn = await asyncpg.connect(user=os.getenv('DB_USER'), password=os.getenv('DB_PASSWORD'),
                                  database=os.getenv('DB_NAME'), host=os.getenv('DB_HOST'))
     await conn.execute('''
-        INSERT INTO submissions(file_name, sgf_data, submission_time) 
-        VALUES($1, $2, $3)
-    ''', filename, sgf_data, datetime.datetime.now())
+        INSERT INTO submissions(file_name, sgf_data) 
+        VALUES($1, $2)
+    ''', filename, sgf_data)
     await conn.close()
     
 
