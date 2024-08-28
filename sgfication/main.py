@@ -4,6 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sgfication.img_functions import get_all_spacing, find_matches, get_lowest_index, consolidate_matches, create_sgf
 import numpy as np
 import cv2 as cv
+#db stuff
+import asyncpg
+import os
+from dotenv import load_dotenv
+import datetime
+
 
 app = FastAPI()
 
@@ -56,10 +62,25 @@ async def analyze_image(file: UploadFile = File(...)):
         sgfgame = create_sgf(bool_white, bool_black)
         sgf_data = sgfgame.serialise().decode('utf-8')
         print(sgf_data)
+
+        #send to db
+        await save_to_db(file.filename, sgf_data)
+
         return JSONResponse(content={"sgf": sgf_data})
 
     else:
         raise HTTPException(status_code=400, detail="File provided is not an image.")
+    
+
+async def save_to_db(filename: str, sgf_data: str):
+    load_dotenv()
+    conn = await asyncpg.connect(user=os.getenv('DB_USER'), password=os.getenv('DB_PASSWORD'),
+                                 database=os.getenv('DB_NAME'), host=os.getenv('DB_HOST'))
+    await conn.execute('''
+        INSERT INTO submissions(file_name, sgf_data, submission_time) 
+        VALUES($1, $2, $3)
+    ''', filename, sgf_data, datetime.datetime.now())
+    await conn.close()
     
 
 # Add CORS middleware
