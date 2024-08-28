@@ -73,7 +73,7 @@ async def analyze_image(file: UploadFile = File(...)):
     
 
 async def save_to_db(filename: str, sgf_data: str):
-    load_dotenv()
+    load_dotenv('pg.env')
     conn = await asyncpg.connect(user=os.getenv('DB_USER'), password=os.getenv('DB_PASSWORD'),
                                  database=os.getenv('DB_NAME'), host=os.getenv('DB_HOST'))
     await conn.execute('''
