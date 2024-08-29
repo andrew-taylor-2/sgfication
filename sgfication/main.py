@@ -72,7 +72,8 @@ async def analyze_image(file: UploadFile = File(...)):
     
 
 async def save_to_db(filename: str, sgf_data: str):
-    load_dotenv('pg.env')
+    load_dotenv('sgfication/pg.env') #why do i have to give folder ?
+    print(os.getenv('DB_USER'), os.getenv('DB_PASSWORD'), os.getenv('DB_NAME'), os.getenv('DB_HOST'))
     conn = await asyncpg.connect(user=os.getenv('DB_USER'), password=os.getenv('DB_PASSWORD'),
                                  database=os.getenv('DB_NAME'), host=os.getenv('DB_HOST'))
     await conn.execute('''
