@@ -3,11 +3,14 @@ channels:
   - defaults
   - conda-forge
 dependencies:
+  - asyncpg
   - blas
   - brotli
   - brotli-bin
   - bzip2
   - ca-certificates
+  - click
+  - colorama
   - contourpy
   - cycler
   - expat
@@ -23,6 +26,7 @@ dependencies:
   - libbrotlidec
   - libbrotlienc
   - libclang
+  - libclang13
   - libdeflate
   - libffi
   - libpng
@@ -59,6 +63,8 @@ dependencies:
   - tk
   - tornado
   - tzdata
+  - vc
+  - vs2015_runtime
   - wheel
   - xz
   - zlib
@@ -66,8 +72,8 @@ dependencies:
   - pip:
       - annotated-types
       - anyio
-      - click
-      - colorama
+      - certifi
+      - charset-normalizer
       - fastapi
       - h11
       - httptools
@@ -79,11 +85,13 @@ dependencies:
       - python-dotenv
       - python-multipart
       - pyyaml
+      - requests
       - scipy
       - sgfmill
       - sniffio
       - starlette
       - typing-extensions
+      - urllib3
       - uvicorn
       - watchfiles
       - websockets
