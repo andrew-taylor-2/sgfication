@@ -39,7 +39,7 @@ const content = [
   },
   {}, // this is to fix the modulo 2 so that the pics still zig zag
   {
-    text: "Maecenas sed diam eget risus varius blandit sit amet non magna.",
+    text: "Building this website has provided some opportunities for learning new skills as well. I'm using a React.js frontend that communicates with my Python backend image processing app via FastAPI. The application is hosted on an AWS EC2 instance with Nginx as the web server. User submissions are stored in a PostgreSQL database. I've also learned about networking, efficiently using cloud computing resources, and security considerations.",
     img: "/public/biopics/pic3.png",
   },
   {
