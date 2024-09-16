@@ -1,0 +1,116 @@
+diff --git a/node_modules/@sabaki/shudan/src/Goban.js b/node_modules/@sabaki/shudan/src/Goban.js
+index f20ec21..0f2d3b6 100644
+--- a/node_modules/@sabaki/shudan/src/Goban.js
++++ b/node_modules/@sabaki/shudan/src/Goban.js
+@@ -20,26 +20,36 @@ export default class Goban extends Component {
+   constructor(props) {
+     super(props);
+ 
+-    this.state = {};
++    this.state = {
++      shiftMap: props.shiftMap || [], // Initialize shiftMap from props
++      animatedVertices: [],
++      clearAnimatedVerticesHandler: null
++    };
+   }
+ 
+-  componentDidUpdate() {
++  componentDidUpdate(prevProps) {
++    // Check if shiftMap prop has changed and update internal state if necessary
++    if (this.props.shiftMap !== prevProps.shiftMap) {
++      this.setState({ shiftMap: this.props.shiftMap });
++    }
++
++    // Handle other state changes and animations
+     if (
+       this.props.animateStonePlacement &&
+-      !this.state.clearAnimatedVerticesHandler &&
+-      this.state.animatedVertices.length > 0
++      !this.state.clearAnimatedVerticesHandler 
+     ) {
+-      // Handle stone animation
+-
+-      for (let [x, y] of this.state.animatedVertices) {
+-        this.state.shiftMap[y][x] = random(7) + 1;
+-        readjustShifts(this.state.shiftMap, [x, y]);
+-      }
++      const { shiftMap } = this.state;
+ 
+-      this.setState({ shiftMap: this.state.shiftMap });
+-
+-      // Clear animation classes
++      // dont forget, this is how to okay a full board of random shifts
++      //  shiftMap: readjustShifts(signMap.map((row) => row.map((_) => random(8)))),
++   // Animate all vertices where the shiftMap has changed
++      this.setState({
++        animatedVertices: shiftMap.flatMap((row, y) =>
++          row.map((shift, x) => (shift !== prevProps.shiftMap?.[y]?.[x] ? [x, y] : null))
++        ).filter(Boolean), // Filter out unchanged vertices
++      });
+ 
++      // Set a timeout to clear the animated vertices after the animation duration
+       this.setState({
+         clearAnimatedVerticesHandler: setTimeout(() => {
+           this.setState({
+@@ -49,12 +59,13 @@ export default class Goban extends Component {
+         }, this.props.animationDuration ?? 200),
+       });
+     }
+-  }
++}
++
+ 
+   render() {
+-    let { width, height, rangeX, rangeY, xs, ys, hoshis, shiftMap, randomMap } =
++    let { width, height, rangeX, rangeY, xs, ys, hoshis, shiftMap } =
+       this.state;
+-
++      // should we assign randomMap here ?
+     let {
+       innerProps = {},
+       vertexSize = 24,
+@@ -62,6 +73,7 @@ export default class Goban extends Component {
+       coordY,
+       busy,
+       signMap,
++      randomMap,
+       paintMap,
+       heatMap,
+       markerMap,
+@@ -69,6 +81,7 @@ export default class Goban extends Component {
+       fuzzyStonePlacement = false,
+       showCoordinates = false,
+       lines = [],
++      // do we need lines there ? 
+       selectedVertices = [],
+       dimmedVertices = [],
+     } = this.props;
+@@ -76,20 +89,21 @@ export default class Goban extends Component {
+     let animatedVertices = [].concat(
+       ...this.state.animatedVertices.map(neighborhood)
+     );
+-
++    // will this work as intended in both situations (normal and given shiftmap?)
+     return h(
+       "div",
+       {
+         ...innerProps,
+         id: this.props.id,
+-        className:
+-          classnames("shudan-goban", "shudan-goban-image", {
++        className: classnames(
++          "shudan-goban",
++          "shudan-goban-image",
++          {
+             "shudan-busy": busy,
+             "shudan-coordinates": showCoordinates,
+-          }) +
+-          " " +
+-          (this.props.class ?? this.props.className ?? ""),
+-
++          },
++          this.props.class ?? this.props.className
++        ),
+         style: {
+           display: "inline-grid",
+           gridTemplateRows: showCoordinates ? "1em 1fr 1em" : "1fr",
