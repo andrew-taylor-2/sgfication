@@ -19,18 +19,9 @@ async def analyze_image(file: UploadFile = File(...)):
         image_data = await file.read()
         image_array = np.frombuffer(image_data, np.uint8)
         image = cv.imdecode(image_array, cv.IMREAD_GRAYSCALE)
-        # Save temporary image to disk to use with the existing function
-        #temp_img_path = 'temp_image.jpg'
-        #cv.imwrite(temp_img_path, image)
+
         # Call the function from img_functions.py
         row_spacing, column_spacing = get_all_spacing(image)
-        
-        #return {"row_spacing": row_spacing, "column_spacing": column_spacing}
-
-        # in app
-        #black_matches = find_matches(image, "/app/assets/ogs/OGS_blackpiece_cropped.png")
-        #intersection_matches = find_matches(image, "/app/assets/ogs/OGS_intersection_cropped.png")
-        #white_matches = find_matches(image, "/app/assets/ogs/OGS_whitepiece_cropped.png")
 
         # not in app
         black_matches = find_matches(image, "assets/ogs/OGS_blackpiece_cropped.png",visualize=False)
@@ -45,7 +36,6 @@ async def analyze_image(file: UploadFile = File(...)):
 
         board_white, _= consolidate_matches(white_matches,row_spacing,column_spacing,lowest_x,lowest_y)
         board_black, _= consolidate_matches(black_matches,row_spacing,column_spacing,lowest_x,lowest_y)
-        #board_inter, _= consolidate_matches(intersection_matches,row_spacing,column_spacing,lowest_x,lowest_y)
 
         bool_white=np.zeros((19,19),dtype=bool)
         for x,y in board_white:
@@ -86,7 +76,7 @@ async def save_to_db(filename: str, sgf_data: str):
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Adjust this to your frontend's URL
+    allow_origins=["http://localhost:5173"],  # Adjust this to frontend's URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
