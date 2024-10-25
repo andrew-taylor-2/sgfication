@@ -67,7 +67,7 @@ const Board = () => {
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
-      const response = await axios.post(apiUrl.concat('/analyze/'), formData, {
+      const response = await axios.post(`${apiUrl}/analyze/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
