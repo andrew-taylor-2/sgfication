@@ -75,9 +75,11 @@ async def save_to_db(filename: str, sgf_data: str):
 
 # Add CORS middleware
 load_dotenv('url.env')
+allowed_origins = os.getenv('FRONTEND_ADDRESS',"").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv('FRONTEND_ADDRESS')],  # frontend location
+    allow_origins=[origin.strip() for origin in allowed_origins if origin],  # frontend location
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
