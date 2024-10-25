@@ -66,7 +66,7 @@ const Board = () => {
     formData.append("file", file);
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = import.meta.env.VITE_API_URL;
       const response = await axios.post(`${apiUrl}/analyze/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
