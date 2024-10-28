@@ -8,7 +8,7 @@ import './PDFViewer.css'; // Import your custom CSS
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf'; // Use legacy build for better compatibility
 
 const PDFViewer = () => {
-  const pdfUrl = '../../public/resume.pdf'; // Replace with your PDF URL
+  const pdfUrl = '/resume.pdf'; // Replace with your PDF URL
 
   pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
 
