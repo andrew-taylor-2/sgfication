@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline, GlobalStyles, Box, Toolbar } from '@mui/material';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
@@ -7,7 +7,6 @@ import viteLogo from '/vite.svg';
 import NavDrawer from './components/NavDrawer';
 import About from './components/About';
 import Bio from './components/Bio';
-import Upload from './components/Upload';
 import Board from './components/Board';
 import './App.css';
 
@@ -39,21 +38,13 @@ function App() {
         <Box component="main" sx={{ flexGrow: 1, p: 3, marginLeft: '240px' }}>
           <Toolbar />
         <Routes>
-          <Route path="/about" element={<About />} />
           <Route path="/bio" element={<Bio />} />
+          <Route path="/about" element={<About />} />
           <Route path="/board" element={<Board sgfData={sgfData} setSgfData={setSgfData} />} />
-          <Route path="/" element={<Home count={count} setCount={setCount} />} />
+          <Route path="/" element={<Navigate to="/bio" replace />} />
         </Routes>
         </Box>
       </Router>
-    </>
-  );
-}
-
-function Home({ count, setCount }) {
-  return (
-    <>
-      
     </>
   );
 }
