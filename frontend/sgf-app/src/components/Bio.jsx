@@ -52,7 +52,7 @@ const Bio = () => {
     return (
       <>
         {globalStyles}
-        <Container maxWidth="lg" sx={{ padding: '2rem 0' }}>
+        <Container maxWidth="lg" sx={{ padding: '0rem 0' }}>
           {content.map((item, index) => (
             <Box
               key={index}
@@ -69,7 +69,7 @@ const Bio = () => {
                   src={item.img}
                   alt={`Image ${index + 1}`}
                   sx={{
-                    width: '75%',
+                    width: index === 0 ? '35%' : '50%', // Adjust the size of the first image
                     height: 'auto',
                     borderRadius: '8px',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
@@ -83,7 +83,7 @@ const Bio = () => {
                 sx={{
                   width: item.fullWidth ? '100%' : '50%',
                   color: '#fff',
-                  padding: '1rem',
+                  padding: '0rem',
                   textAlign: item.fullWidth ? 'center' : 'left',
                 }}
                 dangerouslySetInnerHTML={{ __html: item.text }}

@@ -54,7 +54,7 @@ function NavDrawer() {
             </IconButton>
           )}
           <Typography variant="h6" noWrap>
-            SGFication
+            James <b>Andrew Taylor</b>
           </Typography>
         </Toolbar>
       </StyledAppBar>
