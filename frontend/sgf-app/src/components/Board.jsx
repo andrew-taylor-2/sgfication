@@ -22,6 +22,7 @@ const Board = () => {
   const [isBusy, setIsBusy] = useState(false);
   const [file, setFile] = useState(null);
   const [sgfData, setSgfData] = useState(null);
+  const [isBlackTurn, setIsBlackTurn] = useState(true);
 
   useEffect(() => {
     if (sgfData) {
@@ -85,6 +86,17 @@ const Board = () => {
     }
   };
 
+  const handleStonePlace = (evt, [x, y]) => {
+    // Only handle left clicks (button === 0)
+    if (evt.button === 0) {
+      const sign = isBlackTurn ? 1 : -1; // 1 for black, -1 for white
+      const newBoard = new GoBoard(signMap);
+      const nBm = newBoard.makeMove(sign, [x, y]);
+      setSignMap(nBm.signMap);
+      setIsBlackTurn(!isBlackTurn); // Toggle turn
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -115,7 +127,10 @@ const Board = () => {
           </p>
           <p style={{ margin: '0 0 .5em 0' }}>
             Stones:
-            <button type="button" title="Reset" onClick={() => setSignMap(defaultSignMap)}>•</button>
+            <button type="button" title="Reset" onClick={() => {
+              setSignMap(defaultSignMap);
+              setIsBlackTurn(true); // Reset turn to black when clearing board
+            }}>•</button>
           </p>
           <label>
             <input 
@@ -156,12 +171,7 @@ const Board = () => {
             showCoordinates={showCoordinates}
             fuzzyStonePlacement={fuzzyStonePlacement}
             animateStonePlacement={animateStonePlacement}
-            onVertexMouseUp={(evt, [x, y]) => {
-              const sign = evt.button === 0 ? 1 : -1;
-              const newBoard = new GoBoard(signMap);
-              const nBm = newBoard.makeMove(sign, [x, y]);
-              setSignMap(nBm.signMap);
-            }}
+            onVertexMouseUp={handleStonePlace}
           />
         </div>
 
