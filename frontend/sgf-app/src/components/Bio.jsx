@@ -42,10 +42,6 @@ const content = [
     text: "Building this website has provided some opportunities for learning new skills as well. I'm using a React.js frontend that communicates with my Python backend image processing app via FastAPI. The application is hosted on an AWS EC2 instance with Nginx as the web server. User submissions are stored in a PostgreSQL database. I've also learned about networking, efficiently using cloud computing resources, and security considerations.",
     img: "/biopics/pic3.png",
   },
-  {
-    text: "Curabitur blandit tempus porttitor. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.",
-    img: "/biopics/pic2.png",
-  },
 ];
 
 const Bio = () => {
