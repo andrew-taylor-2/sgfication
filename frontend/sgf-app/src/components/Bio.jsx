@@ -18,7 +18,7 @@ const globalStyles = (
 const content = [
   
   {
-    img: "/biopics/pic0.png",
+    img: "/biopics/landscape_for_site.svg",
     fullWidth: true,
   },
   {
@@ -31,7 +31,7 @@ const content = [
   },
   {
     text: "Through my research I've developed skills and software competencies; the most important of these are descriptive and inferential statistical analysis, as well as image analytic techniques, such as image registration, segmentation, filtering, and mathematical modeling. <p> I use Python's Pandas and statsmodels for statistical modeling (see <a href='https://github.com/andrew-taylor-2/Time-Series-Regressions-in-Pandas/blob/main/Time%20Series%20Analysis.ipynb' style='color: #add8e6;'>this repo</a> for an example of how I extracted trends from the astronauts' pre- to postflight cognitive measure changes). For image analysis, I use MATLAB and Python with numpy and the OpenCV library.</p> ",
-    img: "/biopics/pic2.png",
+    img: "/biopics/pic3.png",
   },
   {
     text: "I've combined my Python skills with my love for the ancient board game Go to create a computer vision app. On the 'Board' tab of this website, you'll find a Go board. Upload an image of a game, and the app will use OpenCV tools to identify the positions and render the board, allowing you to continue playing here on the website.",
@@ -40,7 +40,7 @@ const content = [
   {}, // this is to fix the modulo 2 so that the pics still zig zag
   {
     text: "Building this website has provided some opportunities for learning new skills as well. I'm using a React.js frontend that communicates with my Python backend image processing app via FastAPI. The application is hosted on an AWS EC2 instance with Nginx as the web server. User submissions are stored in a PostgreSQL database. I've also learned about networking, efficiently using cloud computing resources, and security considerations.",
-    img: "/biopics/pic3.png",
+    img: "/biopics/pic2.png",
   },
 ];
 
@@ -65,7 +65,7 @@ const Bio = () => {
                   src={item.img}
                   alt={`Image ${index + 1}`}
                   sx={{
-                    width: index === 0 ? '35%' : '50%', // Adjust the size of the first image
+                    width: index === 0 ? '100%' : '50%', // Adjust the size of the first image
                     height: 'auto',
                     borderRadius: '8px',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
