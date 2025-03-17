@@ -292,7 +292,7 @@ def consolidate_matches(matches, row_spacing, col_spacing, lowest_x, lowest_y):
 #   probably for the best. this is kind of like transforming vox2world, doing something, then going back world2vox
 
 @accept_images_or_filenames(num_images=1,color_mode='grayscale')
-def find_circles(image, row_spacing, column_spacing, keep_intermediate=True):
+def find_circles(image, row_spacing, column_spacing, keep_intermediate=True,min_circle_dist=None):
 
     #recycling this from intersections code
 
@@ -323,7 +323,8 @@ def find_circles(image, row_spacing, column_spacing, keep_intermediate=True):
     lower_bound_piece_radius= np.round(   (average_spacing/2) * 0.8   ).astype("int")
 
     #min circle distance is based on spacing as well
-    min_circle_dist=average_spacing * 0.9 
+    if min_circle_dist is None:
+        min_circle_dist=average_spacing * 0.9
 
     #could try houghlines probabilistic (i have good values for size bounds, so I'm setting param2 a little lower)
     circles = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, min_circle_dist, param1=50, param2=20, minRadius=lower_bound_piece_radius, maxRadius=upper_bound_piece_radius)
