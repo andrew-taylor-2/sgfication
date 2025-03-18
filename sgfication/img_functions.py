@@ -335,8 +335,9 @@ def find_circles(image, row_spacing, column_spacing, keep_intermediate=True):
 
         for (x, y, r) in circles:
             cv.circle(image, (x, y), r, (0, 255, 0), 2)
-    
-    cv.imwrite('circles.png', image)
+        
+    if keep_intermediate:
+        cv.imwrite('circles.png', image)
     return circles
 
 # Helper functions section
