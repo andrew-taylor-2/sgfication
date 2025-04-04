@@ -9,7 +9,7 @@ def crop_piece(board_img_fn, piece_img_fn, outfile='cropped_piece.png', debug_ou
     
     row_spacing, column_spacing = imf.get_all_spacing(board_img_fn)
     
-    circles = imf.find_circles(piece_img_fn, row_spacing, column_spacing,min_circle_dist=0)
+    circles = imf.find_circles(piece_img_fn, row_spacing, column_spacing,keep_intermediate=True)
     
     debug_img = piece_img.copy()
     

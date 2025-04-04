@@ -307,7 +307,7 @@ def find_circles(image, row_spacing, column_spacing, keep_intermediate=True):
         cv.imwrite('blurred.png',blurred)
 
     # Step 2: Edge detection
-    edges = cv.Canny(blurred, 50, 150, apertureSize=3)
+    edges = cv.Canny(blurred, 50, 200, apertureSize=3)
 
     if keep_intermediate:
         #debug
